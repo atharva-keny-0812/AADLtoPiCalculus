@@ -1,0 +1,119 @@
+[comment encoding = UTF-8 /]
+[module generate('http://aadl.info/AADL/2.0/instance', 'http://aadl.info/AADL/2.0')]
+
+[comment -- Maps AADL string identifiers to Pi-Calculus agent names using CamelCase -- /]
+[template public genAgentName(c : ComponentInstance)]
+[for (s : String | c.name.tokenize('_'))][s.toUpperFirst()/][/for]
+[/template]
+
+[comment -- Provides a unique integer-based identity (x_n) for each thread subcomponent -- /]
+[query public getThreadXId(ti : ComponentInstance, allThreads : Sequence(ComponentInstance)) : String = 
+    'x_' + allThreads->indexOf(ti).toString() /]
+
+[comment -- Provides a unique integer-based identity (c_n) for each bus/channel medium -- /]
+[query public getBusCId(bi : ComponentInstance, allBuses : Sequence(ComponentInstance)) : String = 
+    'c_' + allBuses->indexOf(bi).toString() /]
+
+[comment -- Generates the interface/parameter list of an agent based on AADL FeatureInstances -- /]
+[template public genPortList(ti : ComponentInstance)]
+[for (fi : FeatureInstance | ti.featureInstance) before(', ') separator(', ')][fi.name.toLower() /][/for]
+[/template]
+
+[comment -- Translates AADL Port semantics into Pi-Calculus synchronization primitives -- /]
+[comment -- Out DataPort: (^v)'ch<v> (Restriction + Output) | EventPort: 'ch (Signal) | InPort: ch(v) (Input) -- /]
+[template public genCommAction(fi : FeatureInstance, xId : String)]
+[let vName : String = xId + '_' + fi.name.toLower() + '_v'][if (fi.direction.toString() = 'out')][if (fi.category.toString() = 'dataPort')](^[vName /])'[fi.name.toLower() /]<[vName /]>[else]'[fi.name.toLower() /][/if][else][fi.name.toLower() /]([vName /])[/if][/let]
+[/template]
+
+[comment -- MAIN SYSTEM TRANSFORMATION -- /]
+
+[template public generatePi(aSystemInstance : SystemInstance)]
+[comment @main /]
+[file (aSystemInstance.name.toLower().concat('_system.pi'), false, 'UTF-8')]
+[comment -- Global scope variables capturing all architectural elements to ensure injective mapping -- /]
+[let allThreads : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'thread')->asSequence()]
+[let allBuses : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'bus')->asSequence()]
+[let allProcesses : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'process')->asSequence()]
+
+[comment -- PROCESS GENERATION: -- /]
+[comment -- Maps Process Implementation to a Parallel Composition of its internal Thread agents -- /]
+[for (pi : ComponentInstance | allProcesses)]
+[let pName : String = genAgentName(pi).trim()]
+/* --- Process: [pi.name /] --- */
+[comment -- Signature includes control channels (initial, dispatch, complete) and component parameters -- /]
+agent [pName /](initial, dispatch, complete[for (sub : ComponentInstance | pi.componentInstance->select(c | c.category.toString() = 'thread'))], [getThreadXId(sub, allThreads) /][genPortList(sub) /][/for]) = 
+[comment -- Use the parallel operator (|) to model concurrent execution of software subcomponents -- /]
+[for (sub : ComponentInstance | pi.componentInstance->select(c | c.category.toString() = 'thread')) separator(' | ')]
+	[genAgentName(sub).trim() /]_Halted(initial, dispatch, complete, [getThreadXId(sub, allThreads) /][genPortList(sub) /])
+[/for]
+
+[/let]
+[/for]
+
+[comment -- THREAD GENERATION: -- /]
+[comment -- Maps Thread execution cycles into three discrete formal states: Halted, Wait, and Compute -- /]
+[for (ti : ComponentInstance | allThreads)]
+[let name : String = genAgentName(ti).trim()]
+[let xId : String = getThreadXId(ti, allThreads)]
+/* --- Thread: [ti.name /] --- */
+[comment -- Halted: The registration phase where the component announces its identity to the scheduler -- /]
+agent [name /]_Halted(initial, dispatch, complete, [xId /][genPortList(ti)/]) = 
+	'initial<[xId /]>.[name /]_Wait(initial, dispatch, complete, [xId /][genPortList(ti)/])
+
+[comment -- Wait: The idle phase where the agent blocks until a matching dispatch signal is received -- /]
+agent [name /]_Wait(initial, dispatch, complete, [xId /][genPortList(ti)/]) = 
+	dispatch(d).[ '[' /]d=[xId /][ ']' /][name /]_Compute(initial, dispatch, complete, [xId /][genPortList(ti)/])
+
+[comment -- Compute: The active phase modeling execution latency (t) and synchronous port I/O actions -- /]
+agent [name /]_Compute(initial, dispatch, complete, [xId /][genPortList(ti)/]) = 
+	[for (fi : FeatureInstance | ti.featureInstance->select(f | f.direction.toString() = 'in'))][genCommAction(fi, xId)/].[/for]t[for (fi : FeatureInstance | ti.featureInstance->select(f | f.direction.toString() = 'out'))].[genCommAction(fi, xId)/][/for].'complete<[xId /]>.[name /]_Wait(initial, dispatch, complete, [xId /][genPortList(ti)/])
+
+[/let][/let]
+[/for]
+
+[comment -- BUS GENERATION: -- /]
+[comment -- Models physical hardware as a relay agent that enforces data propagation delay -- /]
+[for (bi : ComponentInstance | allBuses)]
+[let bName : String = genAgentName(bi).trim()]
+[let cId : String = getBusCId(bi, allBuses)]
+/* --- Bus: [bi.name /] --- */
+[comment -- Captures data into a unique hardware buffer variable, delays by 't', and re-transmits -- /]
+agent [bName /]([cId /]) = [cId /]([cId /]_data).t.'[cId /]<[cId /]_data>.[bName /]([cId /])
+
+[/let][/let]
+[/for]
+
+[comment -- SCHEDULER GENERATION: DYNAMIC ROUND-ROBIN DISPATCHER -- /]
+[comment -- Captures AADL Actual_Processor_Binding semantics via a recursive state-machine -- /]
+[let allProcessors : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'processor')->asSequence()]
+[for (proc : ComponentInstance | allProcessors)]
+[let procName : String = genAgentName(proc).trim()]
+[for (i : Integer | Sequence{0..allThreads->size()})]
+[let currentThreads : Sequence(Integer) = Sequence{1..i}]
+/* --- Processor: [proc.name /] --- */
+agent [procName /]_Sched_[i /](initial, dispatch, complete[for (j : Integer | currentThreads)], x_[j /][/for]) = 
+[if (i < allThreads->size())]
+	[comment -- COLLECTION PHASE: Synchronously collect unique Thread IDs (x_n) during boot-up -- /]
+	initial(x_[i+1 /]).[procName /]_Sched_[i+1 /](initial, dispatch, complete[for (j : Integer | currentThreads)], x_[j /][/for], x_[i+1 /]) [if (i > 0)] + [/if]
+[/if]
+[if (i > 0)]
+	[comment -- EXECUTION PHASE: Dispatch head of queue (x_1), wait for completion, then rotate -- /]
+	'dispatch<x_1>.complete(x_1).[procName /]_Sched_[i-1 /](initial, dispatch, complete[if (i >= 2)][for (j : Integer | Sequence{2..i})], x_[j /][/for][/if])
+[/if]
+[/let]
+[/for]
+[/let]
+[/for]
+
+[comment -- SYSTEM COMPOSITION -- /]
+[comment -- Defines the closed-world scope of the system using the restriction operator (^) -- /]
+/* --- System: [aSystemInstance.name /] --- */
+agent [genAgentName(aSystemInstance) /]() = 
+(^[comment -- Restrict all Bus, Port, and Control channels to create a private communication namespace -- /][for (bi : ComponentInstance | allBuses) separator(', ')][getBusCId(bi, allBuses) /][/for][for (ti : ComponentInstance | allThreads)][for (fi : FeatureInstance | ti.featureInstance)], [fi.name.toLower() /][/for][/for], initial, dispatch, complete[for (ti : ComponentInstance | allThreads)], [getThreadXId(ti, allThreads) /][/for]) (
+    [comment -- SOFTWARE LAYER: Parallel composition of Process agents containing AADL threads -- /]
+    [for (pi : ComponentInstance | allProcesses) separator(' | ')][genAgentName(pi) /](initial, dispatch, complete[for (sub : ComponentInstance | pi.componentInstance->select(c | c.category.toString() = 'thread'))], [getThreadXId(sub, allThreads) /][genPortList(sub) /][/for])[/for][if (allBuses->notEmpty())] | [/if][for (bi : ComponentInstance | allBuses) separator(' | ')][genAgentName(bi) /]([getBusCId(bi, allBuses) /])[/for][if (allProcessors->notEmpty())] | [/if][comment -- HARDWARE LAYER: Instantiation of the physical Processor Scheduler -- /][for (proc : ComponentInstance | allProcessors) separator(' | ')][genAgentName(proc).trim() /]_Sched_0(initial, dispatch, complete)[/for]
+)
+
+[/let][/let][/let][/let]
+[/file]
+[/template]

@@ -1,0 +1,18 @@
+# Eclipse/OSATE compiled files
+bin/
+target/
+*.class
+
+# Metadata and local settings (prevents path conflicts)
+.metadata/
+.recommenders/
+.settings/
+.project
+.classpath
+
+# Logs and temp files
+*.log
+RemoteSystemsTempFiles/
+
+# OS specific
+.DS_Store
