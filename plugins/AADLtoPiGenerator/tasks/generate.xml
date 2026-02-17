@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="generate" name="AADLtoPiGenerator">
-    <property name="ECLIPSE_HOME" value="../../../../../Downloads/osate2.app/Contents/Eclipse"/>
-    <property name="ECLIPSE_WORKSPACE" value="../../../../../Downloads/osate2.app/Contents/MacOS/workspace/AADL_Sample"/>
+    <property name="ECLIPSE_HOME" value="../../../../../../../Downloads/osate2.app/Contents/Eclipse"/>
+    <property name="ECLIPSE_WORKSPACE" value="../../../../../../../Downloads/osate2.app/Contents/MacOS/workspace/AADL_Sample"/>
 
     <!-- The classpath with only the dependencies used by the project -->
     <path id="AADLtoPiGenerator.libraryclasspath">

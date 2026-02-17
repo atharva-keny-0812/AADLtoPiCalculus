@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ASCII"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aadl2="http://aadl.info/AADL/2.0" xmlns:instance="http://aadl.info/AADL/2.0/instance">
+  <instance:SystemInstance name="SensorProcessing_Impl_Instance" category="process">
+    <featureInstance name="position_data" direction="out" type="/1">
+      <feature xsi:type="aadl2:DataPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="velocity_data" direction="out" type="/2">
+      <feature xsi:type="aadl2:DataPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedDataPort.1"/>
+    </featureInstance>
+    <featureInstance name="thrust_adjustment" category="eventDataPort" direction="out" type="/2">
+      <feature xsi:type="aadl2:EventDataPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventDataPort.0"/>
+    </featureInstance>
+    <featureInstance name="sensor_status" category="eventPort" direction="out">
+      <feature xsi:type="aadl2:EventPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.9/@ownedEventPort.0"/>
+    </featureInstance>
+    <componentInstance name="position_sensor" category="thread">
+      <featureInstance name="position_output" direction="out" type="/1">
+        <feature xsi:type="aadl2:DataPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedDataPort.0"/>
+      </featureInstance>
+      <featureInstance name="sensor_status" category="eventPort" direction="out">
+        <feature xsi:type="aadl2:EventPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.5/@ownedEventPort.0"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedThreadSubcomponent.0"/>
+      <index>0</index>
+      <classifier xsi:type="aadl2:ThreadType" href="../FlightControlSystem.aadl#FlightControlSystem.PositionSensorThread"/>
+    </componentInstance>
+    <componentInstance name="velocity_sensor" category="thread">
+      <featureInstance name="velocity_output" direction="out" type="/2">
+        <feature xsi:type="aadl2:DataPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedDataPort.0"/>
+      </featureInstance>
+      <featureInstance name="thrust_adjustment" category="eventDataPort" direction="out" type="/2">
+        <feature xsi:type="aadl2:EventDataPort" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.6/@ownedEventDataPort.0"/>
+      </featureInstance>
+      <subcomponent xsi:type="aadl2:ThreadSubcomponent" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedThreadSubcomponent.1"/>
+      <index>0</index>
+      <classifier xsi:type="aadl2:ThreadType" href="../FlightControlSystem.aadl#FlightControlSystem.VelocitySensorThread"/>
+    </componentInstance>
+    <connectionInstance name="position_sensor.position_output -> position_data" kind="portConnection" destination="/0/@featureInstance.0" source="/0/@componentInstance.0/@featureInstance.0">
+      <connectionReference context="/0" source="/0/@componentInstance.0/@featureInstance.0" destination="/0/@featureInstance.0">
+        <connection xsi:type="aadl2:PortConnection" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPortConnection.0"/>
+      </connectionReference>
+    </connectionInstance>
+    <connectionInstance name="position_sensor.sensor_status -> sensor_status" kind="portConnection" destination="/0/@featureInstance.3" source="/0/@componentInstance.0/@featureInstance.1">
+      <connectionReference context="/0" source="/0/@componentInstance.0/@featureInstance.1" destination="/0/@featureInstance.3">
+        <connection xsi:type="aadl2:PortConnection" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPortConnection.2"/>
+      </connectionReference>
+    </connectionInstance>
+    <connectionInstance name="velocity_sensor.velocity_output -> velocity_data" kind="portConnection" destination="/0/@featureInstance.1" source="/0/@componentInstance.1/@featureInstance.0">
+      <connectionReference context="/0" source="/0/@componentInstance.1/@featureInstance.0" destination="/0/@featureInstance.1">
+        <connection xsi:type="aadl2:PortConnection" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPortConnection.1"/>
+      </connectionReference>
+    </connectionInstance>
+    <connectionInstance name="velocity_sensor.thrust_adjustment -> thrust_adjustment" kind="portConnection" destination="/0/@featureInstance.2" source="/0/@componentInstance.1/@featureInstance.1">
+      <connectionReference context="/0" source="/0/@componentInstance.1/@featureInstance.1" destination="/0/@featureInstance.2">
+        <connection xsi:type="aadl2:PortConnection" href="../FlightControlSystem.aadl#/0/@ownedPublicSection/@ownedClassifier.10/@ownedPortConnection.3"/>
+      </connectionReference>
+    </connectionInstance>
+    <classifier xsi:type="aadl2:ProcessImplementation" href="../FlightControlSystem.aadl#FlightControlSystem.SensorProcessing.Impl"/>
+    <systemOperationMode name="No Modes"/>
+    <componentImplementation xsi:type="aadl2:ProcessImplementation" href="../FlightControlSystem.aadl#FlightControlSystem.SensorProcessing.Impl"/>
+  </instance:SystemInstance>
+  <instance:ComponentInstance name="FlightControlSystem::Position" category="data">
+    <classifier xsi:type="aadl2:DataType" href="../FlightControlSystem.aadl#FlightControlSystem.Position"/>
+  </instance:ComponentInstance>
+  <instance:ComponentInstance name="FlightControlSystem::Velocity" category="data">
+    <classifier xsi:type="aadl2:DataType" href="../FlightControlSystem.aadl#FlightControlSystem.Velocity"/>
+  </instance:ComponentInstance>
+</xmi:XMI>

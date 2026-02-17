@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="ASCII"?>
+<diagram:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:diagram="http://osate.org/diagram" formatVersion="7">
+  <element uuid="19772361-e7ec-44e1-8e7e-e7aedcdbcb77" manual="true">
+    <element uuid="4481278a-1023-4fb6-b187-75092b91604b" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>ActuatorProcessing</seg>
+      </bo>
+      <position x="370.7330627441406" y="368.0"/>
+      <size width="172.80078125" height="35.0"/>
+    </element>
+    <element uuid="9e7d6238-5b29-43de-af8d-9e848a8388a0" manual="true">
+      <element uuid="af16a46f-35cf-4cb1-a0d2-aee42665014f" manual="true">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="354.7330627441406" y="385.5"/>
+          <point x="366.7330627441406" y="385.5"/>
+        </bendpoints>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>ActuatorProcessing.Impl</seg>
+      </bo>
+      <position x="149.0390625" y="368.0"/>
+      <size width="201.69400024414062" height="35.0"/>
+    </element>
+    <element uuid="cbb729a9-8dc8-4c56-817c-09c7febe72fd" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>AvionicsBus</seg>
+      </bo>
+      <position x="387.16015625" y="38.0"/>
+      <size width="124.62369537353516" height="35.0"/>
+    </element>
+    <element uuid="0166ae46-da76-4db9-a6ff-0c23d722e076" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>ControlCommand</seg>
+      </bo>
+      <position x="312.1849060058594" y="93.0"/>
+      <size width="156.48567962646484" height="35.0"/>
+    </element>
+    <element uuid="1bb06ab3-15ac-49ae-a7db-99c192580eff" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>ControlLawThread</seg>
+      </bo>
+      <position x="488.67059326171875" y="93.0"/>
+      <size width="166.87630462646484" height="35.0"/>
+    </element>
+    <element uuid="fcb60022-e8eb-42cb-9a8a-d21263b33c49" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>ControlProcessing</seg>
+      </bo>
+      <position x="364.0598907470703" y="313.0"/>
+      <size width="166.12760162353516" height="35.0"/>
+    </element>
+    <element uuid="49b7b53b-bada-4c0e-a3a8-759b7ae2f3ca" manual="true">
+      <element uuid="6a70412b-06cc-4099-b8bf-b282135462cb" manual="true">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="348.05987548828125" y="330.5"/>
+          <point x="360.05987548828125" y="330.5"/>
+        </bendpoints>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>ControlProcessing.Impl</seg>
+      </bo>
+      <position x="149.0390625" y="313.0"/>
+      <size width="195.0208282470703" height="35.0"/>
+    </element>
+    <element uuid="270657b3-3c80-4dc9-8a9a-b8c97f137ba4" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>FlightComputer</seg>
+      </bo>
+      <position x="149.0390625" y="93.0"/>
+      <size width="143.14583587646484" height="35.0"/>
+    </element>
+    <element uuid="ef9a9071-7739-49cf-90f0-5dc4ddfdb9ed" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>FlightControlSystem</seg>
+      </bo>
+      <position x="375.16014099121094" y="423.0"/>
+      <size width="172.0390625" height="35.0"/>
+    </element>
+    <element uuid="e07970a2-80d0-431d-9c14-61f93fbeaa6d" manual="true">
+      <element uuid="c6bfc7a2-c6bf-43bb-ba1d-32b773fa147d" manual="true">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="359.16015625" y="440.5"/>
+          <point x="371.16015625" y="440.5"/>
+        </bendpoints>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>FlightControlSystem.Impl</seg>
+      </bo>
+      <position x="149.0390625" y="423.0"/>
+      <size width="206.12107849121094" height="35.0"/>
+    </element>
+    <element uuid="d81800ff-d060-4fa3-ae39-0f43149e0bdb" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>MainActuatorThread</seg>
+      </bo>
+      <position x="149.0390625" y="148.0"/>
+      <size width="177.98959350585938" height="35.0"/>
+    </element>
+    <element uuid="81cdd8ab-6a0a-4564-9037-955942f7006e" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>Position</seg>
+      </bo>
+      <position x="267.7252655029297" y="38.0"/>
+      <size width="99.43489456176758" height="35.0"/>
+    </element>
+    <element uuid="4867da19-1a31-4c65-b025-23977e92a602" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>PositionSensorThread</seg>
+      </bo>
+      <position x="149.0390625" y="203.0"/>
+      <size width="189.11587524414062" height="35.0"/>
+    </element>
+    <element uuid="262067f1-bfa9-46c7-99a9-0ded9e6be3b5" manual="true">
+      <element uuid="052f5c0c-847a-4866-8136-6244b9842d7e" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>position_data</seg>
+        </bo>
+        <position x="74.06900787353516" y="135.0"/>
+      </element>
+      <element uuid="a0c92e80-f2b6-4c34-be15-e3d911586934" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>sensor_status</seg>
+        </bo>
+        <position x="70.38411712646484"/>
+      </element>
+      <element uuid="a297d869-a552-41d2-8b97-199cef3e1afc" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>thrust_adjustment</seg>
+        </bo>
+        <position x="47.408851623535156" y="90.0"/>
+      </element>
+      <element uuid="0fa4d415-2623-47b8-99e1-93b43371af38" manual="true" dockArea="right">
+        <bo>
+          <seg>feature</seg>
+          <seg>velocity_data</seg>
+        </bo>
+        <position x="75.56640625" y="45.0"/>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>SensorProcessing</seg>
+      </bo>
+      <position x="570.0" y="170.0"/>
+      <size width="165.39192962646484" height="175.0"/>
+    </element>
+    <element uuid="10419228-dc20-4ce5-bbab-071caddda8de" manual="true">
+      <element uuid="fc3652ab-b9a5-4425-9389-95142d6c1150" manual="true">
+        <bo>
+          <seg>realization</seg>
+        </bo>
+        <bendpoints>
+          <point x="347.32421875" y="275.5"/>
+          <point x="359.32421875" y="275.5"/>
+        </bendpoints>
+      </element>
+      <bo>
+        <seg>classifier</seg>
+        <seg>SensorProcessing.Impl</seg>
+      </bo>
+      <position x="149.0390625" y="258.0"/>
+      <size width="194.28515625" height="35.0"/>
+    </element>
+    <element uuid="bcb3e1e0-9019-4c7a-bb3b-9f62a3cc354a" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>Velocity</seg>
+      </bo>
+      <position x="149.0390625" y="38.0"/>
+      <size width="98.68619918823242" height="35.0"/>
+    </element>
+    <element uuid="807030a3-5dc1-422d-a122-3380338d405e" manual="true">
+      <bo>
+        <seg>classifier</seg>
+        <seg>VelocitySensorThread</seg>
+      </bo>
+      <position x="347.0286560058594" y="148.0"/>
+      <size width="188.3671875" height="35.0"/>
+    </element>
+    <bo>
+      <seg>package</seg>
+      <seg>FlightControlSystem</seg>
+    </bo>
+    <position/>
+    <size width="790.0" height="540.0"/>
+  </element>
+  <config type="package" connectionPrimaryLabelsVisible="false">
+    <enabledAadlProperties/>
+    <context>
+      <seg>package</seg>
+      <seg>FlightControlSystem</seg>
+    </context>
+  </config>
+</diagram:Diagram>
