@@ -9,11 +9,11 @@ This repository provides an automated model-driven toolchain to bridge the gap b
 * **`plugins/`**: Contains the pre-compiled `.jar` files for immediate deployment into OSATE.
     * `org.telecomparis.aadl2pi.jar` (Core logic)
     * `org.telecomparis.aadl2pi.ui.jar` (UI/Menu integration)
-* **`source_code/`**: Contains the Eclipse/OSATE projects for developers to import and build:
+* **`src/`**: Contains the Eclipse/OSATE projects for developers to import and build:
     * `org.telecom.acceleo.pi`: Core Acceleo transformation project (.mtl templates).
     * `org.telecomparis.aadl2pi`: Plugin wrapper for the transformation logic.
     * `org.telecomparis.aadl2pi.ui`: UI integration for the OSATE context menu.
-* **`projects/SampleAADL`**: A set of sample AADL projects (including `.aadl` and `.aaxl2` files) used for benchmarking and validation.
+* **`sampleAADLprojects/`**: A set of sample AADL projects (including `.aadl` and `.aaxl2` files) used for benchmarking and validation.
 
 ---
 
@@ -45,6 +45,6 @@ To explore or modify the mapping rules:
 ---
 
 ## Validation with Benchmarks
-The `projects/` folder includes a variety of AADL models. These models serve as a benchmark to ensure that the generated $\pi$-calculus specifications accurately represent the source architecture.
+The `sampleAADLprojects/` folder includes a variety of AADL models. These models serve as a benchmark to ensure that the generated $\pi$-calculus specifications accurately represent the source architecture.
 
 ---
