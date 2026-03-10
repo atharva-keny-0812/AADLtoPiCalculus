@@ -7,7 +7,8 @@ This repository provides an automated model-driven toolchain to bridge the gap b
 ## Repository Structure
 
 * **`plugins/`**: Contains the pre-compiled `.jar` files for immediate deployment into OSATE.
-    * `org.telecomparis.aadl2pi.jar` (Core logic)
+    * `org.telecomparis.acceleo.pi.jar` (Core Transformation Logic)
+    * `org.telecomparis.aadl2pi.jar` (Wrapper for transformation logic)
     * `org.telecomparis.aadl2pi.ui.jar` (UI/Menu integration)
 * **`src/`**: Contains the Eclipse/OSATE projects for developers to import and build:
     * `org.telecom.acceleo.pi`: Core Acceleo transformation project (.mtl templates).
@@ -38,7 +39,7 @@ To explore or modify the mapping rules:
     * Export the `org.telecom.acceleo.pi` project as a **JAR**.
     * Replace the old JAR in the `lib/` folder of the `org.telecomparis.aadl2pi` project.
 5.  **Sync Distribution**: To make your changes available to others, you must update the repository's top-level **`plugins/`** folder:
-    * Export the `org.telecomparis.aadl2pi` projects as **Deployable Plug-ins**.
+    * Export the `org.telecomparis.aadl2pi` and `org.telecomparis.acceleo.pi` projects as **Deployable Plug-ins**.
     * Copy the newly generated JARs into the repository's **`plugins/`** folder.
 6.  **Test**: Launch a **Runtime Instance** of Eclipse to test your changes live.
 
