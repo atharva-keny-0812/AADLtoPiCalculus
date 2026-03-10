@@ -32,7 +32,7 @@ If you simply want to perform transformations within OSATE, you do not need to b
 ### For Developers (Building from Source)
 To explore or modify the mapping rules:
 
-1.  **Import Projects**: Import all projects from the `source_code/` folder into your OSATE workspace.
+1.  **Import Projects**: Import all projects from the `src/` folder into your OSATE workspace.
 2.  **Prerequisites**: Ensure you have the **Acceleo** engine installed in your environment.
 3.  **Edit Mapping**: Open `generate.mtl` in the `org.telecom.acceleo.pi` project to edit the transformation rules.
 4.  **Re-build the Logic**: After changing the `.mtl` file, you must update the plugin:
