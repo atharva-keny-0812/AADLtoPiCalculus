@@ -13,7 +13,7 @@ This repository provides an automated model-driven toolchain to bridge the gap b
     * `org.telecom.acceleo.pi`: Core Acceleo transformation project (.mtl templates).
     * `org.telecomparis.aadl2pi`: Plugin wrapper for the transformation logic.
     * `org.telecomparis.aadl2pi.ui`: UI integration for the OSATE context menu.
-* **`sampleAADLprojects/`**: A set of sample AADL projects (including `.aadl` and `.aaxl2` files) used for benchmarking and validation.
+* **`sampleAADLProjects/`**: A set of sample AADL projects (including `.aadl` and `.aaxl2` files) used for benchmarking and validation.
 
 ---
 
@@ -45,6 +45,6 @@ To explore or modify the mapping rules:
 ---
 
 ## Validation with Benchmarks
-The `sampleAADLprojects/` folder includes a variety of AADL models. These models serve as a benchmark to ensure that the generated $\pi$-calculus specifications accurately represent the source architecture.
+The `sampleAADLProjects/` folder includes a variety of AADL models. These models serve as a benchmark to ensure that the generated $\pi$-calculus specifications accurately represent the source architecture.
 
 ---
