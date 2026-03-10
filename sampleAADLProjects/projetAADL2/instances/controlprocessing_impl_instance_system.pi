@@ -1,0 +1,10 @@
+
+
+agent ControlLaw_Halted(initial, dispatch, complete, x_1, control_output, position_input, thrust_input, velocity_input) = 'initial<x_1>.ControlLaw_Wait(initial, dispatch, complete, x_1, control_output, position_input, thrust_input, velocity_input)
+agent ControlLaw_Wait(initial, dispatch, complete, x_1, control_output, position_input, thrust_input, velocity_input) = dispatch(d).[d=x_1]ControlLaw_Compute(initial, dispatch, complete, x_1, control_output, position_input, thrust_input, velocity_input)
+agent ControlLaw_Compute(initial, dispatch, complete, x_1, control_output, position_input, thrust_input, velocity_input) = position_input(x_1_position_input_v).thrust_input(x_1_thrust_input_v).velocity_input(x_1_velocity_input_v).t.(^x_1_control_output_v)'control_output<x_1_control_output_v>.'complete<x_1>.ControlLaw_Wait(initial, dispatch, complete, x_1, control_output, position_input, thrust_input, velocity_input)
+
+
+
+
+agent ControlProcessingImplInstance = (^, control_output, position_input, thrust_input, velocity_input, initial, dispatch, complete, x_1) 

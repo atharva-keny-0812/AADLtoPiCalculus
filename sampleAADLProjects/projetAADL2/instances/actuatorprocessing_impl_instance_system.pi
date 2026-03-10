@@ -1,0 +1,21 @@
+
+
+/* --- Thread: main_actuator --- */
+agent MainActuator_Halted(initial, dispatch, complete, x_1, command_input, activation) = 
+	'initial<x_1>.MainActuator_Wait(initial, dispatch, complete, x_1, command_input, activation)
+
+agent MainActuator_Wait(initial, dispatch, complete, x_1, command_input, activation) = 
+	dispatch(d).[d=x_1]MainActuator_Compute(initial, dispatch, complete, x_1, command_input, activation)
+
+agent MainActuator_Compute(initial, dispatch, complete, x_1, command_input, activation) = 
+	command_input(x_1_command_input_v).activation(x_1_activation_v).t.'complete<x_1>.MainActuator_Wait(initial, dispatch, complete, x_1, command_input, activation)
+
+
+
+
+/* --- System: ActuatorProcessing_Impl_Instance --- */
+agent ActuatorProcessingImplInstance() = 
+(^, command_input, activation, initial, dispatch, complete, x_1) (
+    
+)
+
