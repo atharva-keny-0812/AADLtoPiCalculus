@@ -5,6 +5,7 @@
 # Transformation outputs
 # Ignores generated .pi files but keeps the directory
 models/SampleProject/instances/output-pi/*
+*.pi
 
 # Eclipse/OSATE build artifacts
 bin/

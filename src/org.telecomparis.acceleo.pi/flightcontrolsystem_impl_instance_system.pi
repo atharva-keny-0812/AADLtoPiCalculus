@@ -1,13 +1,7 @@
 
-agent SensorProcess(initial, dispatch, complete, x_1, position_output, sensor_status, x_2, thrust_adjustment, velocity_output) = 
-PositionSensor_Halted(initial, dispatch, complete, x_1, position_output, sensor_status) | VelocitySensor_Halted(initial, dispatch, complete, x_2, thrust_adjustment, velocity_output)
-
-agent ControlProcess(initial, dispatch, complete, x_3, velocity_input, control_output, position_input, thrust_input) = 
-ControlLaw_Halted(initial, dispatch, complete, x_3, velocity_input, control_output, position_input, thrust_input)
-
-agent ActuatorProcess(initial, dispatch, complete, x_4, command_input, activation) = 
-MainActuator_Halted(initial, dispatch, complete, x_4, command_input, activation)
-
+agent SensorProcess(initial, dispatch, complete, x_1, position_output, sensor_status, x_2, thrust_adjustment, velocity_output) = PositionSensor_Halted(initial, dispatch, complete, x_1, position_output, sensor_status) | VelocitySensor_Halted(initial, dispatch, complete, x_2, thrust_adjustment, velocity_output)
+agent ControlProcess(initial, dispatch, complete, x_3, velocity_input, control_output, position_input, thrust_input) = ControlLaw_Halted(initial, dispatch, complete, x_3, velocity_input, control_output, position_input, thrust_input)
+agent ActuatorProcess(initial, dispatch, complete, x_4, command_input, activation) = MainActuator_Halted(initial, dispatch, complete, x_4, command_input, activation)
 
 agent PositionSensor_Halted(initial, dispatch, complete, x_1, position_output, sensor_status) = 'initial<x_1>.PositionSensor_Wait(initial, dispatch, complete, x_1, position_output, sensor_status)
 agent PositionSensor_Wait(initial, dispatch, complete, x_1, position_output, sensor_status) = dispatch(d).[d=x_1]PositionSensor_Compute(initial, dispatch, complete, x_1, position_output, sensor_status)
@@ -34,6 +28,4 @@ agent FlightComputer_Sched_2(initial, dispatch, complete, x_1, x_2) = initial(x_
 agent FlightComputer_Sched_3(initial, dispatch, complete, x_1, x_2, x_3) = initial(x_4).FlightComputer_Sched_4(initial, dispatch, complete, x_1, x_2, x_3, x_4) + 'dispatch<x_1>.complete(x_1).FlightComputer_Sched_2(initial, dispatch, complete, x_2, x_3)
 agent FlightComputer_Sched_4(initial, dispatch, complete, x_1, x_2, x_3, x_4) = 'dispatch<x_1>.complete(x_1).FlightComputer_Sched_3(initial, dispatch, complete, x_2, x_3, x_4)
 
-agent FlightControlSystemImplInstance = (^c_1, position_output, sensor_status, thrust_adjustment, velocity_output, velocity_input, control_output, position_input, thrust_input, command_input, activation, initial, dispatch, complete, x_1, x_2, x_3, x_4) (
-    SensorProcess(initial, dispatch, complete, x_1, position_output, sensor_status, x_2, thrust_adjustment, velocity_output) | ControlProcess(initial, dispatch, complete, x_3, velocity_input, control_output, position_input, thrust_input) | ActuatorProcess(initial, dispatch, complete, x_4, command_input, activation) | AvionicsBus(c_1) | FlightComputer_Sched_0(initial, dispatch, complete)
-)
+agent FlightControlSystemImplInstance = (^c_1, position_output, sensor_status, thrust_adjustment, velocity_output, velocity_input, control_output, position_input, thrust_input, command_input, activation, initial, dispatch, complete, x_1, x_2, x_3, x_4) (SensorProcess(initial, dispatch, complete, x_1, position_output, sensor_status, x_2, thrust_adjustment, velocity_output) | ControlProcess(initial, dispatch, complete, x_3, velocity_input, control_output, position_input, thrust_input) | ActuatorProcess(initial, dispatch, complete, x_4, command_input, activation) | AvionicsBus(c_1) | FlightComputer_Sched_0(initial, dispatch, complete))
