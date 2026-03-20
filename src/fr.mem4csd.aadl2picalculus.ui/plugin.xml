@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.commands">
+      <command
+            id="fr.mem4csd.aadl2picalculus.ui.convert"
+            name="Convert AADL to Pi-Calculus">
+      </command>
+   </extension>
+
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            class="fr.mem4csd.aadl2picalculus.ui.handlers.GeneratePiHandler"
+            commandId="fr.mem4csd.aadl2picalculus.ui.convert">
+      </handler>
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="fr.mem4csd.aadl2picalculus.ui.convert"
+               label="Convert AADL to Pi-Calculus"
+               style="push">
+            <visibleWhen checkEnabled="false">
+               <iterate ifEmpty="false">
+                  <adapt type="org.eclipse.core.resources.IFile">
+                  	 <test property="org.eclipse.core.resources.extension" value="aaxl2" />
+                  </adapt>
+               </iterate>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+</plugin>
