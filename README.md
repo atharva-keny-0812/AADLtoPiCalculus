@@ -16,6 +16,88 @@ This repository provides an automated model-driven toolchain to bridge the gap b
 
 ---
 
+## Project Workflow: From AADL to π‑Calculus Verification
+
+The verification workflow consists of three main stages: (1) modeling the system architecture in AADL using OSATE, (2) automatically translating the AADL model to π‑calculus using a custom plugin, and (3) verifying temporal properties using the Mobility Workbench (MWB).
+
+---
+
+### Stage 1: AADL Modeling in OSATE
+
+The system architecture is first modeled using the Architecture Analysis and Design Language (AADL) within the OSATE (Open Source AADL Tool Environment) platform. The model captures:
+
+- **Threads** – Periodic tasks with timing properties (period, deadline, WCET).
+- **Ports** – Data ports for regular sensor streams, event ports for status signals, and event‑data ports for urgent adjustments.
+- **Processors and Buses** – Execution resources and communication channels.
+- **Bindings** – Mapping of software components to hardware resources.
+
+**Screenshot: AADL Model in OSATE**
+
+![AADL Model in OSATE](aadl_model.png)
+
+The example above shows the `FlightControlSystem` package with sensor threads (`PositionSensorThread`, `VelocitySensorThread`), a control law thread (`ControlLawThread`), and their associated ports.
+
+---
+
+### Stage 2: Automatic Translation to π‑Calculus
+
+A custom OSATE plugin (`Convert AADL to Pi‑Calculus`) automatically translates the AADL model into a π‑calculus specification. The translation maps:
+
+| AADL Concept | π‑Calculus Equivalent |
+|--------------|----------------------|
+| Periodic thread | Agent with `Halted → Wait → Compute` states |
+| Data port | Channel name (e.g., `position_output`) |
+| Event port | Channel without data (e.g., `sensor_status`) |
+| Processor | Scheduler agent (`FlightComputer_Sched_0`) |
+| Bus | Bus agent (e.g., `AvionicsBus`) |
+| Dispatch protocol | `'initial`, `'dispatch`, `'complete` handshake |
+
+**Screenshot: Plugin Trigger in OSATE**
+
+![Plugin Trigger in OSATE](plugin_trigger.png)
+
+Right‑clicking on the AADL system implementation invokes the translation plugin, which generates a `.pi` file containing the π‑calculus agents.
+
+**Screenshot: Generated π‑Calculus Code**
+
+![Generated π‑Calculus Code](pi_output.png)
+
+The generated code includes agents for each thread (e.g., `PositionSensor_Halted`, `ControlLaw_Compute`), the scheduler (`FlightComputer_Sched_0`), and the avionics bus (`AvionicsBus`).
+
+---
+
+### Stage 3: Temporal Logic Verification in MWB
+
+The generated π‑calculus file is loaded into the Mobility Workbench (MWB), where modal μ‑calculus formulas are used to verify:
+
+- **Deadlock freedom** – The system never reaches a state with no outgoing transitions.
+- **Safety** – No unexpected `error` labels occur.
+- **Liveness** – Tasks eventually complete and messages are delivered.
+- **Schedulability** – Tasks meet their bounded execution time.
+- Other Functional Properties Specific to the Model.
+
+Example MWB check for global deadlock freedom:
+
+```mwb
+check FlightControlSystemImplInstance nu X. (<true> TT & [true] X)
+```
+The verification results confirm that the translated model preserves the intended concurrency and communication semantics of the original AADL specification.
+
+### Workflow Summary Diagram:
+
+```text
+┌─────────────────┐     ┌──────────────────┐     ┌────────────────────┐
+│   AADL Model    │ ──► │  π‑Calculus Code │ ──► │  MWB Verification  │
+│   (OSATE)       │     │  (Generated .pi) │     │  (Yes/No + Trace)  │
+└─────────────────┘     └──────────────────┘     └────────────────────┘
+        │                         │                        │
+        ▼                         ▼                        ▼
+  System architecture      Formal process model      Temporal properties
+  Threads, ports, buses    Agents, channels          Deadlock, liveness
+```
+
+This workflow enables rigorous formal verification of real‑time embedded architectures by bridging the gap between industrial modeling standards (AADL) and process algebraic verification tools (π‑calculus + MWB).
+
 ## Installation & Usage
 
 ### For End Users (Immediate Use)
