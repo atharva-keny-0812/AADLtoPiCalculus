@@ -33,7 +33,7 @@ The system architecture is first modeled using the Architecture Analysis and Des
 
 **Screenshot: AADL Model in OSATE**
 
-![AADL Model in OSATE](aadl_model.png)
+![AADL Model in OSATE](images/workflow%20diagram/aadl_model.png)
 
 The example above shows the `FlightControlSystem` package with sensor threads (`PositionSensorThread`, `VelocitySensorThread`), a control law thread (`ControlLawThread`), and their associated ports.
 
@@ -54,13 +54,13 @@ A custom OSATE plugin (`Convert AADL to Pi‑Calculus`) automatically translates
 
 **Screenshot: Plugin Trigger in OSATE**
 
-![Plugin Trigger in OSATE](plugin_trigger.png)
+![Plugin Trigger in OSATE](images/workflow%20diagram/plugin_trigger.png)
 
 Right‑clicking on the AADL system implementation invokes the translation plugin, which generates a `.pi` file containing the π‑calculus agents.
 
 **Screenshot: Generated π‑Calculus Code**
 
-![Generated π‑Calculus Code](pi_output.png)
+![Generated π‑Calculus Code](images/workflow%20diagram/pi_output.png)
 
 The generated code includes agents for each thread (e.g., `PositionSensor_Halted`, `ControlLaw_Compute`), the scheduler (`FlightComputer_Sched_0`), and the avionics bus (`AvionicsBus`).
 
