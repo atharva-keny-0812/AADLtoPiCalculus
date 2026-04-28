@@ -133,6 +133,8 @@ The `sampleAADLProjects/` folder includes a variety of AADL models that represen
 
 ### Model Explanation
 
+This AADL model illustrates a classic Rate‑Monotonic Scheduling (RMA) system running on a single processor. RMA is a fixed‑priority scheduling policy where tasks with shorter periods get higher priorities an optimal priority assignment for independent periodic tasks under preemptive scheduling.
+
 This model captures a two‑task Rate‑Monotonic Scheduling (RMA) system executing on a single processor. Task1 has a period of 1000 ms and lower priority; Task2 has a period of 500 ms and higher priority. Both tasks autonomously release a single job at initialization, wait for dispatch from a centralized FIFO scheduler, execute for one discrete time tick (`t`), and signal completion. The scheduler maintains a bounded queue of length two. The model represents one hyperperiod—after both tasks execute once, the system reaches a quiescent termination state.
 
 ### AADL Code
@@ -284,7 +286,7 @@ agent RmaImplInstance = (^initial, dispatch, complete, x_1, x_2) (NodeA(initial,
 
 ```mwb
 -- Global deadlock freedom
-check RmaImplInstance nu X. (<true> TT & [true] X)
+check RmaImplInstance nu X. (<true> TT | [true] X)
 
 -- Individual component deadlocks
 deadlocks Task1_Halted<initial,dispatch,complete,x_1>
@@ -315,12 +317,15 @@ check Task2_Compute<initial,dispatch,complete,x_2> <'complete<x_2>> (<initial> T
 -- Global liveness
 check RmaImplInstance mu X. (<t> TT | <tau> TT)
 ```
+[Link to the verified property screenshots](https://docs.google.com/document/d/1jqh5mgmk27D_a5XNb1jtsB2Af1g1dSwreszifLWFI1w/edit?usp=sharing)
 
 ---
 
 ## 2. Car Model ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/car))
 
 ### Model Explanation
+
+This AADL model captures a distributed automotive control system to verify end‑to‑end data flow, distributed schedulability, and absence of communication deadlocks across multiple electronic control units (ECUs). It serves as a case study for analysing real‑time constraints under mixed scheduling policies and shared bus communication.
 
 This model represents a distributed automotive control architecture with three Electronic Control Units (ECUs)—Process A, Process B, and Process C—executing nine periodic tasks that communicate via message‑passing over a shared CAN bus. Each ECU has its own local scheduler with a queue depth of nine. Tasks have producer‑consumer dependencies: T1 produces `m1_out` for T6; T5 produces `m2_out` for T2; T6 produces `m3_out` for T9; and T9 produces `m4_out` for T8. Cross‑ECU messages traverse the CAN bus, while the `m4` exchange between T8 and T9 is local to Process C. The model verifies end‑to‑end data flow, distributed schedulability, and absence of cross‑ECU communication deadlocks.
 
@@ -706,11 +711,15 @@ check CarImplInstance max Z. ((<m1_in>TT | <'m1_out>TT) & [m1_in]Z & ['m1_out]Z)
 -- Global liveness
 check CarImplInstance mu X. (<t> TT | <tau> TT)
 ```
+[Link to the verified property screenshots](https://docs.google.com/document/d/1MRmTpVZiZ-QzQoIXYwZDHvQ-EXVTRcHlH6csgvZ_zJg/edit?usp=sharing)
+
 ---
 
 ## 3. Line Follower Robot ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/line_follower))
 
 ### Model Explanation
+
+This AADL model represents a minimal embedded control system for a line‑following robot based on an ATmega328p microcontroller (Arduino Duemilanove). It captures the hardware/software integration and verifies that the periodic control task can acquire the CPU, complete execution, and communicate correctly over an I²C bus without deadlock reflecting bare‑metal execution without a full RTOS.
 
 This model represents a minimal embedded control system typical of a line‑following robot running on an ATmega328p microcontroller. A single periodic task performs the control loop (sensor read, computation, actuator update), while an I²C bus agent models peripheral communication. The scheduler is intentionally simple, capable of managing only one pending task at a time, reflecting bare‑metal execution without an RTOS. The model verifies that the task successfully acquires the CPU, completes execution, and that the I²C bus correctly relays messages without deadlock.
 
@@ -844,3 +853,4 @@ check I2C<c_1> <c_1> (<t> (<'c_1> TT))
 -- Global liveness
 check LineFollowerRobotIInstance mu X. (<t> TT | <tau> TT)
 ```
+[Link to the verified property screenshots](https://docs.google.com/document/d/1iOYBqWbarYBXchkh8ZTUH78GDRACpIEm3THGzpjJ25Y/edit?usp=sharing)
