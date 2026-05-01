@@ -222,25 +222,25 @@ Here, we present different analysis and verification tasks performed using the M
 
 **Size of processes** (c.f. Figure below)
 
-![Size of processes](images/fig99.PNG)
+![Size of processes](images/Appendices/fig99.PNG)
 
 *Figure: Size of processes*
 
 **Simulation** (c.f. Figure below)
 
-![Simulation of the main process](images/fig98.PNG)
+![Simulation of the main process](images/Appendices/fig98.PNG)
 
 *Figure: Simulation of the main process*
 
 **Deadlock Freedom** (c.f. Figure below)
 
-![Deadlock details](images/fig100.PNG)
+![Deadlock details](images/Appendices/fig100.PNG)
 
 *Figure: Deadlock details*
 
 **Liveness, Schedulability, Mutual Exclusion** (c.f. Figure below)
 
-![Liveness, Schedulability, Mutual Exclusion](images/fig101.PNG)
+![Liveness, Schedulability, Mutual Exclusion](images/Appendices/fig101.PNG)
 
 *Figure: Liveness, Schedulability, Mutual Exclusion*
 
