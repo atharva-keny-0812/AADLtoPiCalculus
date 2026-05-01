@@ -1,3 +1,251 @@
+# Appendices of the paper Mapping AADL into $\pi$-calculus for Formal Verification of Complex Architectures
+
+## Flight Control System AADL Specification
+
+```aadl
+package FlightControlSystem
+public
+  -- Data Type Definitions
+  data Position
+  end Position;
+
+  data Velocity
+  end Velocity;
+
+  data ControlCommand
+  end ControlCommand;
+
+  -- Processor and Bus Definitions
+  processor FlightComputer
+  end FlightComputer;
+
+  bus AvionicsBus
+  end AvionicsBus;
+
+  -- Sensor Thread Definitions
+  thread PositionSensorThread
+  features
+    position_output: out data port Position;
+    sensor_status: out event port;  -- Event port for sensor status
+  end PositionSensorThread;
+
+  thread VelocitySensorThread
+  features
+    velocity_output: out data port Velocity;
+    thrust_adjustment: out event data port Velocity;  -- New event-data port for dynamic thrust adjustments
+  end VelocitySensorThread;
+
+  -- Control Thread Definitions
+  thread ControlLawThread
+  features
+    position_input: in data port Position;
+    velocity_input: in data port Velocity;
+    thrust_input: in event data port Velocity;  -- Receiving thrust adjustment data
+    control_output: out data port ControlCommand;
+  end ControlLawThread;
+
+  -- Actuator Thread Definition
+  thread MainActuatorThread
+  features
+    command_input: in data port ControlCommand;
+    activation: in event port;
+  end MainActuatorThread;
+
+  -- Process Implementations
+  process SensorProcessing
+  features
+    position_data: out data port Position;
+    velocity_data: out data port Velocity;
+    sensor_status: out event port;
+    thrust_adjustment: out event data port Velocity;
+  end SensorProcessing;
+
+  process implementation SensorProcessing.Impl
+  subcomponents
+    position_sensor: thread PositionSensorThread;
+    velocity_sensor: thread VelocitySensorThread;
+  connections
+    position_connection: port position_sensor.position_output -> position_data;
+    velocity_connection: port velocity_sensor.velocity_output -> velocity_data;
+    status_connection: port position_sensor.sensor_status -> sensor_status;
+    thrust_connection: port velocity_sensor.thrust_adjustment -> thrust_adjustment;
+  end SensorProcessing.Impl;
+
+  process ControlProcessing
+  features
+    position_input: in data port Position;
+    velocity_input: in data port Velocity;
+    thrust_input: in event data port Velocity;
+    control_command: out data port ControlCommand;
+  end ControlProcessing;
+
+  process implementation ControlProcessing.Impl
+  subcomponents
+    control_law: thread ControlLawThread;
+  connections
+    position_connection: port position_input -> control_law.position_input;
+    velocity_connection: port velocity_input -> control_law.velocity_input;
+    thrust_connection: port thrust_input -> control_law.thrust_input;
+    control_connection: port control_law.control_output -> control_command;
+  end ControlProcessing.Impl;
+
+  process ActuatorProcessing
+  features
+    command_input: in data port ControlCommand;
+    activation: in event port;
+  end ActuatorProcessing;
+
+  process implementation ActuatorProcessing.Impl
+  subcomponents
+    main_actuator: thread MainActuatorThread;
+  connections
+    command_connection: port command_input -> main_actuator.command_input;
+    activation_connection: port activation -> main_actuator.activation;
+  end ActuatorProcessing.Impl;
+
+  -- Top-Level System
+  system FlightControlSystem
+  end FlightControlSystem;
+
+  system implementation FlightControlSystem.Impl
+  subcomponents
+    sensor_process: process SensorProcessing.Impl;
+    control_process: process ControlProcessing.Impl;
+    actuator_process: process ActuatorProcessing.Impl;
+    flight_computer: processor FlightComputer;
+    avionics_bus: bus AvionicsBus;
+  connections
+    sensor_to_control_position: port sensor_process.position_data -> control_process.position_input;
+    sensor_to_control_velocity: port sensor_process.velocity_data -> control_process.velocity_input;
+    sensor_to_control_thrust: port sensor_process.thrust_adjustment -> control_process.thrust_input;
+    control_to_actuator: port control_process.control_command -> actuator_process.command_input;
+    sensor_status_to_actuator: port sensor_process.sensor_status -> actuator_process.activation;
+    
+  properties
+    Actual_Processor_Binding => (reference(flight_computer)) applies to sensor_process;
+    Actual_Processor_Binding => (reference(flight_computer)) applies to control_process;
+    Actual_Processor_Binding => (reference(flight_computer)) applies to actuator_process;
+    Actual_Connection_Binding => (reference(avionics_bus)) applies to sensor_to_control_position;
+    Actual_Connection_Binding => (reference(avionics_bus)) applies to sensor_to_control_velocity;
+    Actual_Connection_Binding => (reference(avionics_bus)) applies to sensor_to_control_thrust;
+    Actual_Connection_Binding => (reference(avionics_bus)) applies to control_to_actuator;
+    Actual_Connection_Binding => (reference(avionics_bus)) applies to sensor_status_to_actuator;
+  end FlightControlSystem.Impl;
+
+end FlightControlSystem;
+```
+## The full π-calculus Code Generated in MWB Format
+
+Some textual representations of the π-calculus are adapted in MWB as follows: the restriction ν as ^, the output action x̄ as 'x, the internal action τ as t and each process identifier expression in the MWB will start with the keyword *agent* which means process. We can import the generated π-calculus specification using the command *input file.pi*, or type the agent declarations manually. The command *env* can be used to print all the current agent declarations of an uploaded specification. Another thing, all the processes of the π-calculus in MWB must be closed, which means contain all the free names, so do not be surprised when you find them repeated in the processes' declarations.
+
+```mwb
+agent SensorProcessing(initial, dispatch, complete, x_ps, x_vs, position_data, sensor_status, velocity_data, thrust_adjustment) = 
+    PositionSensor_Halted(initial, dispatch, complete, x_ps, position_data, sensor_status) | 
+    VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_data, thrust_adjustment)
+
+agent ControlProcessing(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_command) = 
+    ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_command)
+
+agent ActuatorProcessing(initial, dispatch, complete, x_ma, command_input, activation) = 
+    MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent PositionSensor_Halted(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
+    'initial<x_ps>.PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, sensor_status)
+
+agent PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
+    dispatch(d).[d=x_ps]PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status)
+
+agent PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
+    t.(^pos)'position_output<pos>.'sensor_status.'complete<x_ps>.PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, sensor_status)
+
+agent VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
+    'initial<x_vs>.VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+
+agent VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
+    dispatch(d).[d=x_vs]VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+
+agent VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
+    t.(^vel)'velocity_output<vel>.(^thrust_data)'thrust_adjustment<thrust_data>.'complete<x_vs>.VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+
+agent ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
+    'initial<x_cl>.ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+
+agent ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
+    dispatch(d).[d=x_cl]ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+
+agent ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
+    position_input(pos).velocity_input(vel).thrust_input(thrust).t.(^cmd)'control_output<cmd>.'complete<x_cl>.ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+
+agent MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation) = 
+    'initial<x_ma>.MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation) = 
+    dispatch(d).[d=x_ma]MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation) = 
+    command_input(cmd).activation.t.'complete<x_ma>.MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent FlightComputer_Sched_0(initial, dispatch, complete) = 
+    initial(x_1).FlightComputer_Sched_1(initial, dispatch, complete, x_1)
+
+agent FlightComputer_Sched_1(initial, dispatch, complete, x_1) = 
+    initial(x_2).FlightComputer_Sched_2(initial, dispatch, complete, x_1, x_2) + 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_0(initial, dispatch, complete)
+
+agent FlightComputer_Sched_2(initial, dispatch, complete, x_1, x_2) = 
+    initial(x_3).FlightComputer_Sched_3(initial, dispatch, complete, x_1, x_2, x_3) + 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_1(initial, dispatch, complete, x_2)
+
+agent FlightComputer_Sched_3(initial, dispatch, complete, x_1, x_2, x_3) = 
+    initial(x_4).FlightComputer_Sched_4(initial, dispatch, complete, x_1, x_2, x_3, x_4) + 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_2(initial, dispatch, complete, x_2, x_3)
+
+agent FlightComputer_Sched_4(initial, dispatch, complete, x_1, x_2, x_3, x_4) = 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_3(initial, dispatch, complete, x_2, x_3, x_4)
+
+agent AvionicsBus(c) = c(x).t.'c<x>.AvionicsBus(c)
+
+agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status, thrust_adjustment, 
+    position_input, velocity_input, thrust_input, control_output, command_input, control_command, activation, 
+    initial, dispatch, complete, x_ps, x_vs, x_cl, x_ma)(
+    SensorProcessing(initial, dispatch, complete, x_ps, x_vs, position_input, activation, velocity_input, thrust_input) | 
+    ControlProcessing(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, command_input) | 
+    ActuatorProcessing(initial, dispatch, complete, x_ma, command_input, activation) | 
+    FlightComputer_Sched_0(initial, dispatch, complete) | 
+    AvionicsBus(c)
+)
+```
+
+## Analysis and Verification Proofs
+
+Here, we present different analysis and verification tasks performed using the MWB tool.
+
+**Size of processes** (c.f. Figure below)
+
+![Size of processes](images/fig99.PNG)
+
+*Figure: Size of processes*
+
+**Simulation** (c.f. Figure below)
+
+![Simulation of the main process](images/fig98.PNG)
+
+*Figure: Simulation of the main process*
+
+**Deadlock Freedom** (c.f. Figure below)
+
+![Deadlock details](images/fig100.PNG)
+
+*Figure: Deadlock details*
+
+**Liveness, Schedulability, Mutual Exclusion** (c.f. Figure below)
+
+![Liveness, Schedulability, Mutual Exclusion](images/fig101.PNG)
+
+*Figure: Liveness, Schedulability, Mutual Exclusion*
+
+---
+
 # AADL to $\pi$-Calculus Model Transformation Tool
 
 This repository provides an automated model-driven toolchain to bridge the gap between architectural modeling in **AADL** and formal verification in **$\pi$-Calculus**. The tool automates the mapping rules defined in our approach to facilitate the formal analysis of real-time systems.
