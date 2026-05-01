@@ -15,7 +15,9 @@ Require-Bundle: org.eclipse.jface,
  org.eclipse.acceleo.engine;bundle-version="3.7.17",
  org.eclipse.ui,
  org.eclipse.core.resources;bundle-version="3.22.100",
- fr.mem4csd.aadl2picalculus.acceleo.pi;bundle-version="1.0.0"
+ fr.mem4csd.aadl2picalculus.acceleo.pi;bundle-version="1.0.0",
+ org.eclipse.jface.text;bundle-version="3.27.0",
+ org.eclipse.e4.ui.workbench;bundle-version="1.17.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Automatic-Module-Name: org.telecomparis.aadl2pi.ui
 Import-Package: jakarta.annotation;version="[2.1.0,3.0.0)",

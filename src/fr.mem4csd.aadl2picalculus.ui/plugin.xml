@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+
    <extension point="org.eclipse.ui.commands">
       <command
             id="fr.mem4csd.aadl2picalculus.ui.convert"
             name="Convert AADL to Pi-Calculus">
+      </command>
+      <command
+            id="fr.mem4csd.aadl2picalculus.ui.exportCustom"
+            name="Export to Pi-Calculus (Custom)">
       </command>
    </extension>
 
@@ -13,23 +18,27 @@
             class="fr.mem4csd.aadl2picalculus.ui.handlers.GeneratePiHandler"
             commandId="fr.mem4csd.aadl2picalculus.ui.convert">
       </handler>
+      <handler
+            class="fr.mem4csd.aadl2picalculus.ui.handlers.GeneratePiHandler"
+            commandId="fr.mem4csd.aadl2picalculus.ui.exportCustom">
+      </handler>
    </extension>
 
    <extension point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <command
-               commandId="fr.mem4csd.aadl2picalculus.ui.convert"
-               label="Convert AADL to Pi-Calculus"
-               style="push">
+      <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command commandId="fr.mem4csd.aadl2picalculus.ui.convert" label="Convert AADL to Pi-Calculus">
             <visibleWhen checkEnabled="false">
-               <iterate ifEmpty="false">
-                  <adapt type="org.eclipse.core.resources.IFile">
-                  	 <test property="org.eclipse.core.resources.extension" value="aaxl2" />
-                  </adapt>
-               </iterate>
+               <iterate><adapt type="org.eclipse.core.resources.IFile">
+                  <test property="org.eclipse.core.resources.extension" value="aaxl2" />
+               </adapt></iterate>
             </visibleWhen>
          </command>
+      </menuContribution>
+
+      <menuContribution locationURI="menu:org.osate.ui.pnt.menu?after=additions">
+         <menu id="fr.mem4csd.aadl2picalculus.ui.osateSubMenu" label="Pi-Calculus Tools">
+            <command commandId="fr.mem4csd.aadl2picalculus.ui.exportCustom" label="Export to Pi-Calculus..." />
+         </menu>
       </menuContribution>
    </extension>
 </plugin>
