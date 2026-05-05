@@ -215,6 +215,7 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
     AvionicsBus(c)
 )
 ```
+However, because of problem of parallism with verification tools, we have simplified the code geenrated by eliminating the match expressions as follows:
 
 ## Analysis and Verification Proofs
 
