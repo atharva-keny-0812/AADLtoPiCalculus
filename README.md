@@ -138,6 +138,9 @@ end FlightControlSystem;
 
 Some textual representations of the π-calculus are adapted in MWB as follows: the restriction ν as ^, the output action x̄ as 'x, the internal action τ as t and each process identifier expression in the MWB will start with the keyword *agent* which means process. We can import the generated π-calculus specification using the command *input file.pi*, or type the agent declarations manually. The command *env* can be used to print all the current agent declarations of an uploaded specification. Another thing, all the processes of the π-calculus in MWB must be closed, which means contain all the free names, so do not be surprised when you find them repeated in the processes' declarations.
 
+
+However, because of problem of parallism with verification tools, we have simplified the code geenrated by eliminating the match expressions as follows:
+
 ```mwb
 agent SensorProcessing(initial, dispatch, complete, x_ps, x_vs, position_data, sensor_status, velocity_data, thrust_adjustment) = 
     PositionSensor_Halted(initial, dispatch, complete, x_ps, position_data, sensor_status) | 
@@ -215,7 +218,6 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
     AvionicsBus(c)
 )
 ```
-However, because of problem of parallism with verification tools, we have simplified the code geenrated by eliminating the match expressions as follows:
 
 ## Analysis and Verification Proofs
 
