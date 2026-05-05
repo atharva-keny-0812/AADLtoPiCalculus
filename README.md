@@ -138,9 +138,6 @@ end FlightControlSystem;
 
 Some textual representations of the π-calculus are adapted in MWB as follows: the restriction ν as ^, the output action x̄ as 'x, the internal action τ as t and each process identifier expression in the MWB will start with the keyword *agent* which means process. We can import the generated π-calculus specification using the command *input file.pi*, or type the agent declarations manually. The command *env* can be used to print all the current agent declarations of an uploaded specification. Another thing, all the processes of the π-calculus in MWB must be closed, which means contain all the free names, so do not be surprised when you find them repeated in the processes' declarations.
 
-
-However, because of problem of parallism with verification tools, we have simplified the code geenrated by eliminating the match expressions as follows:
-
 ```mwb
 agent SensorProcessing(initial, dispatch, complete, x_ps, x_vs, position_data, sensor_status, velocity_data, thrust_adjustment) = 
     PositionSensor_Halted(initial, dispatch, complete, x_ps, position_data, sensor_status) | 
@@ -159,7 +156,7 @@ agent PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, se
     dispatch(d).[d=x_ps]PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status)
 
 agent PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
-    t.(^pos)'position_output<pos>.'sensor_status.'complete<x_ps>.PositionSensor_Halted(initial, dispatch, complete, x_ps, position_output, sensor_status)
+    t.(^pos)'position_output<pos>.'sensor_status.'complete<x_ps>.PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, sensor_status)
 
 agent VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
     'initial<x_vs>.VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
@@ -168,7 +165,7 @@ agent VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, th
     dispatch(d).[d=x_vs]VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
 
 agent VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
-    t.(^vel)'velocity_output<vel>.(^thrust_data)'thrust_adjustment<thrust_data>.'complete<x_vs>.VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+    t.(^vel)'velocity_output<vel>.(^thrust_data)'thrust_adjustment<thrust_data>.'complete<x_vs>.VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
 
 agent ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
     'initial<x_cl>.ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
@@ -177,13 +174,93 @@ agent ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocit
     dispatch(d).[d=x_cl]ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
 
 agent ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
-    position_input(pos).velocity_input(vel).thrust_input(thrust).t.(^cmd)'control_output<cmd>.'complete<x_cl>.ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+    position_input(pos).velocity_input(vel).thrust_input(thrust).t.(^cmd)'control_output<cmd>.'complete<x_cl>.ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
 
 agent MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation) = 
     'initial<x_ma>.MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation)
 
 agent MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation) = 
     dispatch(d).[d=x_ma]MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation) = 
+    command_input(cmd).activation.t.'complete<x_ma>.MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent FlightComputer_Sched_0(initial, dispatch, complete) = 
+    initial(x_1).FlightComputer_Sched_1(initial, dispatch, complete, x_1)
+
+agent FlightComputer_Sched_1(initial, dispatch, complete, x_1) = 
+    initial(x_2).FlightComputer_Sched_2(initial, dispatch, complete, x_1, x_2) + 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_0(initial, dispatch, complete)
+
+agent FlightComputer_Sched_2(initial, dispatch, complete, x_1, x_2) = 
+    initial(x_3).FlightComputer_Sched_3(initial, dispatch, complete, x_1, x_2, x_3) + 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_1(initial, dispatch, complete, x_2)
+
+agent FlightComputer_Sched_3(initial, dispatch, complete, x_1, x_2, x_3) = 
+    initial(x_4).FlightComputer_Sched_4(initial, dispatch, complete, x_1, x_2, x_3, x_4) + 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_2(initial, dispatch, complete, x_2, x_3)
+
+agent FlightComputer_Sched_4(initial, dispatch, complete, x_1, x_2, x_3, x_4) = 
+    'dispatch<x_1>.complete(x_1).FlightComputer_Sched_3(initial, dispatch, complete, x_2, x_3, x_4)
+
+agent AvionicsBus(c) = c(x).t.'c<x>.AvionicsBus(c)
+
+agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status, thrust_adjustment, 
+    position_input, velocity_input, thrust_input, control_output, command_input, control_command, activation, 
+    initial, dispatch, complete, x_ps, x_vs, x_cl, x_ma)(
+    SensorProcessing(initial, dispatch, complete, x_ps, x_vs, position_input, activation, velocity_input, thrust_input) | 
+    ControlProcessing(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, command_input) | 
+    ActuatorProcessing(initial, dispatch, complete, x_ma, command_input, activation) | 
+    FlightComputer_Sched_0(initial, dispatch, complete) | 
+    AvionicsBus(c)
+)
+```
+
+However, because of problem of parallism with verification tools, we have simplified the code geenrated by eliminating the match expressions as follows:
+
+```mwb
+agent SensorProcessing(initial, dispatch, complete, x_ps, x_vs, position_data, sensor_status, velocity_data, thrust_adjustment) = 
+    PositionSensor_Halted(initial, dispatch, complete, x_ps, position_data, sensor_status) | 
+    VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_data, thrust_adjustment)
+
+agent ControlProcessing(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_command) = 
+    ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_command)
+
+agent ActuatorProcessing(initial, dispatch, complete, x_ma, command_input, activation) = 
+    MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent PositionSensor_Halted(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
+    'initial<x_ps>.PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, sensor_status)
+
+agent PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
+    dispatch(d).PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status)
+
+agent PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
+    t.(^pos)'position_output<pos>.'sensor_status.'complete<x_ps>.PositionSensor_Halted(initial, dispatch, complete, x_ps, position_output, sensor_status)
+
+agent VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
+    'initial<x_vs>.VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+
+agent VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
+    dispatch(d).VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+
+agent VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
+    t.(^vel)'velocity_output<vel>.(^thrust_data)'thrust_adjustment<thrust_data>.'complete<x_vs>.VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+
+agent ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
+    'initial<x_cl>.ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+
+agent ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
+    dispatch(d).ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+
+agent ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
+    position_input(pos).velocity_input(vel).thrust_input(thrust).t.(^cmd)'control_output<cmd>.'complete<x_cl>.ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+
+agent MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation) = 
+    'initial<x_ma>.MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation)
+
+agent MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation) = 
+    dispatch(d).MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation)
 
 agent MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation) = 
     command_input(cmd).activation.t.'complete<x_ma>.MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation)
