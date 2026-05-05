@@ -156,7 +156,7 @@ agent PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, se
     dispatch(d).[d=x_ps]PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status)
 
 agent PositionSensor_Compute(initial, dispatch, complete, x_ps, position_output, sensor_status) = 
-    t.(^pos)'position_output<pos>.'sensor_status.'complete<x_ps>.PositionSensor_Wait(initial, dispatch, complete, x_ps, position_output, sensor_status)
+    t.(^pos)'position_output<pos>.'sensor_status.'complete<x_ps>.PositionSensor_Halted(initial, dispatch, complete, x_ps, position_output, sensor_status)
 
 agent VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
     'initial<x_vs>.VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
@@ -165,7 +165,7 @@ agent VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, th
     dispatch(d).[d=x_vs]VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
 
 agent VelocitySensor_Compute(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment) = 
-    t.(^vel)'velocity_output<vel>.(^thrust_data)'thrust_adjustment<thrust_data>.'complete<x_vs>.VelocitySensor_Wait(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
+    t.(^vel)'velocity_output<vel>.(^thrust_data)'thrust_adjustment<thrust_data>.'complete<x_vs>.VelocitySensor_Halted(initial, dispatch, complete, x_vs, velocity_output, thrust_adjustment)
 
 agent ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
     'initial<x_cl>.ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
@@ -174,7 +174,7 @@ agent ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocit
     dispatch(d).[d=x_cl]ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
 
 agent ControlLaw_Compute(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output) = 
-    position_input(pos).velocity_input(vel).thrust_input(thrust).t.(^cmd)'control_output<cmd>.'complete<x_cl>.ControlLaw_Wait(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
+    position_input(pos).velocity_input(vel).thrust_input(thrust).t.(^cmd)'control_output<cmd>.'complete<x_cl>.ControlLaw_Halted(initial, dispatch, complete, x_cl, position_input, velocity_input, thrust_input, control_output)
 
 agent MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation) = 
     'initial<x_ma>.MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation)
@@ -183,7 +183,7 @@ agent MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activa
     dispatch(d).[d=x_ma]MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation)
 
 agent MainActuator_Compute(initial, dispatch, complete, x_ma, command_input, activation) = 
-    command_input(cmd).activation.t.'complete<x_ma>.MainActuator_Wait(initial, dispatch, complete, x_ma, command_input, activation)
+    command_input(cmd).activation.t.'complete<x_ma>.MainActuator_Halted(initial, dispatch, complete, x_ma, command_input, activation)
 
 agent FlightComputer_Sched_0(initial, dispatch, complete) = 
     initial(x_1).FlightComputer_Sched_1(initial, dispatch, complete, x_1)
