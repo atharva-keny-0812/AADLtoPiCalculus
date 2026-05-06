@@ -1,6 +1,6 @@
 # Appendices of the paper Mapping AADL into $\pi$-calculus for Formal Verification of Complex Architectures
 
-## Flight Control System AADL Specification
+## A. Flight Control System AADL Specification
 
 ```aadl
 package FlightControlSystem
@@ -134,7 +134,7 @@ public
 
 end FlightControlSystem;
 ```
-## The full π-calculus Code Generated in MWB Format
+## B. The full π-calculus Code Generated in MWB Format
 
 Some textual representations of the π-calculus are adapted in MWB as follows: the restriction ν as ^, the output action x̄ as 'x, the internal action τ as t and each process identifier expression in the MWB will start with the keyword *agent* which means process. We can import the generated π-calculus specification using the command *input file.pi*, or type the agent declarations manually. The command *env* can be used to print all the current agent declarations of an uploaded specification. Another thing, all the processes of the π-calculus in MWB must be closed, which means contain all the free names, so do not be surprised when you find them repeated in the processes' declarations.
 
@@ -216,7 +216,7 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 )
 ```
 
-## Analysis and Verification Proofs
+## C. Analysis and Verification Proofs
 
 Here, we present different analysis and verification tasks performed using the MWB tool.
 
@@ -316,6 +316,9 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 # AADL to $\pi$-Calculus Model Transformation Tool
 
 This repository provides an automated model-driven toolchain to bridge the gap between architectural modeling in **AADL** and formal verification in **$\pi$-Calculus**. The tool automates the mapping rules defined in our approach to facilitate the formal analysis of real-time systems.
+
+![Outline of Project](images/workflow%20diagram/outline.png)
+
 
 ---
 
@@ -601,7 +604,7 @@ agent RmaImplInstance = (^initial, dispatch, complete, x_1, x_2) (NodeA(initial,
 
 ```mwb
 -- Global deadlock freedom
-check RmaImplInstance nu X. (<true> TT | [true] X)
+deadlocks RmaImplInstance
 
 -- Individual component deadlocks
 deadlocks Task1_Halted<initial,dispatch,complete,x_1>
@@ -946,7 +949,7 @@ agent CarImplInstance = (^c_1, m4_in, m3_in, m1_in, m2_in, x_1, x_2, x_3, x_4, x
 
 ```mwb
 -- Global deadlock freedom
-check CarImplInstance nu X. (<true> TT & [true] X)
+deadlocks CarImplInstance
 
 -- Individual component deadlocks
 deadlocks T1_Halted<initial,dispatch,complete,x_1,m1_out>
@@ -1138,7 +1141,7 @@ agent LineFollowerRobotIInstance = (^c_1, , x_1, initial, dispatch, complete) (C
 
 ```mwb
 -- Global deadlock freedom
-check LineFollowerRobotIInstance nu X. (<true> TT & [true] X)
+deadlocks LineFollowerRobotIInstance 
 
 -- Individual component deadlocks
 deadlocks Task1_Halted<initial,dispatch,complete,x_1>
