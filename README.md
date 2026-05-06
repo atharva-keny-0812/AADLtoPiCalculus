@@ -238,7 +238,7 @@ Here, we present different analysis and verification tasks performed using the M
 
 *Figure: Deadlock details*
 
-For the deadlock property, and because of the problem of state explosion in MWB verification tool, we have simplified the pi-calculus code geenrated by eliminating the match expressions. This allows thread processes to not synchonize on matching rules which helps reducing the state space and checking the property, otherwise the tool continues to execute without returning any results and sometimes finiches the execution surprisingly. The slightely changed code is given as follows:
+For the deadlock property, and because of the problem of state explosion in MWB verification tool, we have simplified the pi-calculus code geenrated by eliminating the match expressions. This allows thread processes to not synchonize on matching tests which helps reducing the state space and checking the property, otherwise the tool continues to execute without returning any results and sometimes finiches the execution surprisingly. The other properties are valid for both versions. The slightely changed version is given as follows:
 
 ```mwb
 agent SensorProcessing(initial, dispatch, complete, x_ps, x_vs, position_data, sensor_status, velocity_data, thrust_adjustment) = 
