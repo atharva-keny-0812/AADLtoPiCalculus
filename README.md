@@ -319,6 +319,8 @@ This repository provides an automated model-driven toolchain to bridge the gap b
 
 ![Outline of Project](images/workflow%20diagram/outline.png)
 
+The above figure gives the entire outline of the project.
+
 
 ---
 
