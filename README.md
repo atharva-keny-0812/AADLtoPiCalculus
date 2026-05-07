@@ -316,6 +316,7 @@ This states that starting from MainActuator_Halted, the process will eventually 
 This states that starting from PositionSensor_Halted, the process will eventually be able to perform a write on channel position_output. Similarly, any intermediate input or output steps are permitted before reaching this output.
 
 *Schedulability Properties*
+
 Schedulability properties verify that the system respects its Round-Robin scheduling policy. They are expressed using greatest fixed point formulas, which capture invariants that must hold throughout all system executions.
 
 *Property 3* — Cyclic order of thread initiation:
