@@ -327,7 +327,7 @@ This states that after every dispatch output followed by a completion, the sched
 
 This states that after any dispatch, another dispatch is not immediately possible, and only becomes possible again after a complete is received, ensuring no thread is re-dispatched before finishing.
 
-Mutual Exclusion Property
+*Mutual Exclusion Property*
 
 *Property 5* — Serialized dispatching under multi-core assumption:
 
