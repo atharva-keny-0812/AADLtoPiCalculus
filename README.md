@@ -315,11 +315,11 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 
 # II. AADL to $\pi$-Calculus Model Transformation Tool
 
-This repository provides an automated model-driven toolchain to bridge the gap between architectural modeling in **AADL** and formal verification in **$\pi$-Calculus**. The tool automates the mapping rules defined in our approach to facilitate the formal analysis of real-time systems.
+This repository explains with details the developed automated model-driven toolchain, used to bridge the gap between architectural modeling in **AADL** and formal verification in **$\pi$-Calculus**. The tool automates the mapping rules defined in our approach to facilitate the formal analysis of real-time embedded systems. The figure bellow illustrates the entire outline of the project.
+
 
 ![Outline of Project](images/workflow%20diagram/outline.png)
 
-The above figure gives the entire outline of the project.
 
 
 ---
