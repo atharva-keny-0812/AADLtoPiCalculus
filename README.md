@@ -311,7 +311,7 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 
 *Figure: Liveness, Schedulability, Mutual Exclusion*
 
-**Equivalence checking**
+**Equivalence checking**  (c.f. Figure below)
 
 
 ---
