@@ -872,15 +872,15 @@ end Car;
 ```pi
 agent ProcessA(initial, dispatch, complete, x_1, m1_out, x_2, m2_in) = T1_Halted(initial, dispatch, complete, x_1, m1_out) | T2_Halted(initial, dispatch, complete, x_2, m2_in)
 agent ProcessB(initial, dispatch, complete, x_3, x_4, x_5, m2_out, x_6, m1_in, m3_out) = T3_Halted(initial, dispatch, complete, x_3) | T4_Halted(initial, dispatch, complete, x_4) | T5_Halted(initial, dispatch, complete, x_5, m2_out) | T6_Halted(initial, dispatch, complete, x_6, m1_in, m3_out)
-agent ProcessC(initial, dispatch, complete, x_7, x_8, m4_in, x_9, m4_out, m3_in) = T7_Halted(initial, dispatch, complete, x_7) | T8_Halted(initial, dispatch, complete, x_8, m4_in) | T9_Halted(initial, dispatch, complete, x_9, m4_out, m3_in)
+agent ProcessC(initial, dispatch, complete, x_7, x_8, m4_in, x_9, m3_in, m4_out) = T7_Halted(initial, dispatch, complete, x_7) | T8_Halted(initial, dispatch, complete, x_8, m4_in) | T9_Halted(initial, dispatch, complete, x_9, m3_in, m4_out)
 
 agent T1_Halted(initial, dispatch, complete, x_1, m1_out) = 'initial<x_1>.T1_Wait(initial, dispatch, complete, x_1, m1_out)
 agent T1_Wait(initial, dispatch, complete, x_1, m1_out) = dispatch(d).[d=x_1]T1_Compute(initial, dispatch, complete, x_1, m1_out)
-agent T1_Compute(initial, dispatch, complete, x_1, m1_out) = t.'m1_out.'complete<x_1>.T1_Wait(initial, dispatch, complete, x_1, m1_out)
+agent T1_Compute(initial, dispatch, complete, x_1, m1_out) = t.(^x_1_m1_out_v)'m1_out<x_1_m1_out_v>.'complete<x_1>.T1_Wait(initial, dispatch, complete, x_1, m1_out)
 
 agent T2_Halted(initial, dispatch, complete, x_2, m2_in) = 'initial<x_2>.T2_Wait(initial, dispatch, complete, x_2, m2_in)
 agent T2_Wait(initial, dispatch, complete, x_2, m2_in) = dispatch(d).[d=x_2]T2_Compute(initial, dispatch, complete, x_2, m2_in)
-agent T2_Compute(initial, dispatch, complete, x_2, m2_in) = m2_in.t.'complete<x_2>.T2_Wait(initial, dispatch, complete, x_2, m2_in)
+agent T2_Compute(initial, dispatch, complete, x_2, m2_in) = m2_in(x_2_m2_in_v).t.'complete<x_2>.T2_Wait(initial, dispatch, complete, x_2, m2_in)
 
 agent T3_Halted(initial, dispatch, complete, x_3) = 'initial<x_3>.T3_Wait(initial, dispatch, complete, x_3)
 agent T3_Wait(initial, dispatch, complete, x_3) = dispatch(d).[d=x_3]T3_Compute(initial, dispatch, complete, x_3)
@@ -892,11 +892,11 @@ agent T4_Compute(initial, dispatch, complete, x_4) = t.'complete<x_4>.T4_Wait(in
 
 agent T5_Halted(initial, dispatch, complete, x_5, m2_out) = 'initial<x_5>.T5_Wait(initial, dispatch, complete, x_5, m2_out)
 agent T5_Wait(initial, dispatch, complete, x_5, m2_out) = dispatch(d).[d=x_5]T5_Compute(initial, dispatch, complete, x_5, m2_out)
-agent T5_Compute(initial, dispatch, complete, x_5, m2_out) = t.'m2_out.'complete<x_5>.T5_Wait(initial, dispatch, complete, x_5, m2_out)
+agent T5_Compute(initial, dispatch, complete, x_5, m2_out) = t.(^x_5_m2_out_v)'m2_out<x_5_m2_out_v>.'complete<x_5>.T5_Wait(initial, dispatch, complete, x_5, m2_out)
 
 agent T6_Halted(initial, dispatch, complete, x_6, m1_in, m3_out) = 'initial<x_6>.T6_Wait(initial, dispatch, complete, x_6, m1_in, m3_out)
 agent T6_Wait(initial, dispatch, complete, x_6, m1_in, m3_out) = dispatch(d).[d=x_6]T6_Compute(initial, dispatch, complete, x_6, m1_in, m3_out)
-agent T6_Compute(initial, dispatch, complete, x_6, m1_in, m3_out) = m1_in.t.'m3_out.'complete<x_6>.T6_Wait(initial, dispatch, complete, x_6, m1_in, m3_out)
+agent T6_Compute(initial, dispatch, complete, x_6, m1_in, m3_out) = m1_in(x_6_m1_in_v).t.(^x_6_m3_out_v)'m3_out<x_6_m3_out_v>.'complete<x_6>.T6_Wait(initial, dispatch, complete, x_6, m1_in, m3_out)
 
 agent T7_Halted(initial, dispatch, complete, x_7) = 'initial<x_7>.T7_Wait(initial, dispatch, complete, x_7)
 agent T7_Wait(initial, dispatch, complete, x_7) = dispatch(d).[d=x_7]T7_Compute(initial, dispatch, complete, x_7)
@@ -904,11 +904,11 @@ agent T7_Compute(initial, dispatch, complete, x_7) = t.'complete<x_7>.T7_Wait(in
 
 agent T8_Halted(initial, dispatch, complete, x_8, m4_in) = 'initial<x_8>.T8_Wait(initial, dispatch, complete, x_8, m4_in)
 agent T8_Wait(initial, dispatch, complete, x_8, m4_in) = dispatch(d).[d=x_8]T8_Compute(initial, dispatch, complete, x_8, m4_in)
-agent T8_Compute(initial, dispatch, complete, x_8, m4_in) = m4_in.t.'complete<x_8>.T8_Wait(initial, dispatch, complete, x_8, m4_in)
+agent T8_Compute(initial, dispatch, complete, x_8, m4_in) = m4_in(x_8_m4_in_v).t.'complete<x_8>.T8_Wait(initial, dispatch, complete, x_8, m4_in)
 
-agent T9_Halted(initial, dispatch, complete, x_9, m4_out, m3_in) = 'initial<x_9>.T9_Wait(initial, dispatch, complete, x_9, m4_out, m3_in)
-agent T9_Wait(initial, dispatch, complete, x_9, m4_out, m3_in) = dispatch(d).[d=x_9]T9_Compute(initial, dispatch, complete, x_9, m4_out, m3_in)
-agent T9_Compute(initial, dispatch, complete, x_9, m4_out, m3_in) = m3_in.t.'m4_out.'complete<x_9>.T9_Wait(initial, dispatch, complete, x_9, m4_out, m3_in)
+agent T9_Halted(initial, dispatch, complete, x_9, m3_in, m4_out) = 'initial<x_9>.T9_Wait(initial, dispatch, complete, x_9, m3_in, m4_out)
+agent T9_Wait(initial, dispatch, complete, x_9, m3_in, m4_out) = dispatch(d).[d=x_9]T9_Compute(initial, dispatch, complete, x_9, m3_in, m4_out)
+agent T9_Compute(initial, dispatch, complete, x_9, m3_in, m4_out) = m3_in(x_9_m3_in_v).t.(^x_9_m4_out_v)'m4_out<x_9_m4_out_v>.'complete<x_9>.T9_Wait(initial, dispatch, complete, x_9, m3_in, m4_out)
 
 
 agent CAN(c_1) = c_1(c_1_data).t.'c_1<c_1_data>.CAN(c_1)
@@ -944,7 +944,7 @@ agent CPUC_Sched_7(initial, dispatch, complete, y_1, y_2, y_3, y_4, y_5, y_6, y_
 agent CPUC_Sched_8(initial, dispatch, complete, y_1, y_2, y_3, y_4, y_5, y_6, y_7, y_8) = initial(y_9).CPUC_Sched_9(initial, dispatch, complete, y_1, y_2, y_3, y_4, y_5, y_6, y_7, y_8, y_9) + 'dispatch<y_1>.complete(y_1).CPUC_Sched_7(initial, dispatch, complete, y_2, y_3, y_4, y_5, y_6, y_7, y_8)
 agent CPUC_Sched_9(initial, dispatch, complete, y_1, y_2, y_3, y_4, y_5, y_6, y_7, y_8, y_9) = 'dispatch<y_1>.complete(y_1).CPUC_Sched_8(initial, dispatch, complete, y_2, y_3, y_4, y_5, y_6, y_7, y_8, y_9)
 
-agent CarImplInstance = (^c_1, m4_in, m3_in, m1_in, m2_in, x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, initial, dispatch, complete) (ProcessA(initial, dispatch, complete, x_1, m1_in, x_2, m2_in) | ProcessB(initial, dispatch, complete, x_3, x_4, x_5, m2_in, x_6, m1_in, m3_in) | ProcessC(initial, dispatch, complete, x_7, x_8, m4_in, x_9, m4_in, m3_in) | CAN(c_1) | CPUA_Sched_0(initial, dispatch, complete) | CPUB_Sched_0(initial, dispatch, complete) | CPUC_Sched_0(initial, dispatch, complete))
+agent CarImplInstance = (^initial, dispatch, complete, c_1, m1_out, m2_in, m2_out, m1_in, m3_out, m4_in, m3_in, m4_out, x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9) (ProcessA(initial, dispatch, complete, x_1, m1_in, x_2, m2_in) | ProcessB(initial, dispatch, complete, x_3, x_4, x_5, m2_in, x_6, m1_in, m3_in) | ProcessC(initial, dispatch, complete, x_7, x_8, m4_in, x_9, m3_in, m4_in) | CAN(c_1) | CPUA_Sched_0(initial, dispatch, complete) | CPUB_Sched_0(initial, dispatch, complete) | CPUC_Sched_0(initial, dispatch, complete))
 ```
 
 ### d. Temporal Logic Properties (MWB)
@@ -1136,7 +1136,7 @@ agent I2C(c_1) = c_1(c_1_data).t.'c_1<c_1_data>.I2C(c_1)
 agent ATMEGA328p_Sched_0(initial, dispatch, complete) = initial(y_1).ATMEGA328p_Sched_1(initial, dispatch, complete, y_1) 
 agent ATMEGA328p_Sched_1(initial, dispatch, complete, y_1) = 'dispatch<y_1>.complete(y_1).ATMEGA328p_Sched_0(initial, dispatch, complete)
 
-agent LineFollowerRobotIInstance = (^c_1, , x_1, initial, dispatch, complete) (Code(initial, dispatch, complete, x_1) | I2C(c_1) | ATMEGA328p_Sched_0(initial, dispatch, complete))
+agent LineFollowerRobotIInstance = (^initial, dispatch, complete, c_1, x_1) (Code(initial, dispatch, complete, x_1) | I2C(c_1) | ATMEGA328p_Sched_0(initial, dispatch, complete))
 ```
 
 ### d. Temporal Logic Properties (MWB)
