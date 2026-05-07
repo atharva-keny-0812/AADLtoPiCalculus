@@ -516,7 +516,8 @@ agent FlightControlSystemRefinedImplInstance = (^initial, dispatch, complete, c_
 
 ![equivalencechecking](images/Appendices/eq_check.png)
 
-*Figure: Equivalence Checking*
+*Figure: Bisimulation Equivalence Check*
+
 ---
 
 # II. AADL to $\pi$-Calculus Model Transformation Tool
