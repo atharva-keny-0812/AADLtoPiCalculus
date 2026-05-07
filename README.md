@@ -301,9 +301,8 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 ```
 **Liveness, Schedulability, Mutual Exclusion** (c.f. Figure below)
 
-These are the properties formulas elaborated in the Mads logic (adapted from mu-calculus). It is to note that μ in the standard modal μ\mu μ-calculus corresponds to min⁡\min min in Mads Dam's notation, both denote the least fixed point, capturing liveness properties (something eventually happens). ν\nu
-ν in the standard modal μ\mu μ-calculus corresponds to max⁡\max max in Mads Dam's notation, both denote the greatest fixed point, capturing safety properties (something always holds). We can use both of notations here. The results are shown in the figure bellow.
-
+These are the properties formulas elaborated in the Mads logic (adapted from mu-calculus). It is to note that **μ** in the standard modal μ-calculus corresponds to **min** in Mads Dam's notation — both denote the **least fixed point**, used to express *liveness properties* (i.e., something eventually happens). **ν** in the standard modal μ-calculus corresponds to **max** in Mads Dam's notation — both denote the **greatest fixed point**, used to express *safety properties* (i.e., something always holds). We can use both of notations here. The results are shown in the figure bellow.
+ 
 *Liveness Properties*
 Liveness properties verify that desired states are eventually reached during the execution of the system. They are expressed using least fixed point formulas: the process may perform any sequence of input or output steps (<true>X or <'true>X), but must eventually reach the target action.
 
