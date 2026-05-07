@@ -306,23 +306,28 @@ These are the properties formulas elaborated in the Mads logic (adapted from mu-
 
 *Liveness Properties*
 Liveness properties verify that desired states are eventually reached during the execution of the system. They are expressed using least fixed point formulas: the process may perform any sequence of input or output steps (<true>X or <'true>X), but must eventually reach the target action.
+
 *Property 1* — MainActuator eventually receives a command:
 prove MainActuator_Halted min X.(<command_input>TT | (<true>X | <'true>X))
 This states that starting from MainActuator_Halted, the process will eventually be able to perform a read on channel command_input. Along the way, it may perform any number of input or output actions on other channels.
+
 *Property 2* — PositionSensor eventually outputs position data:
 prove PositionSensor_Halted min X.(<'position_output>TT | (<true>X | <'true>X))
 This states that starting from PositionSensor_Halted, the process will eventually be able to perform a write on channel position_output. Similarly, any intermediate input or output steps are permitted before reaching this output.
 
 *Schedulability Properties*
 Schedulability properties verify that the system respects its Round-Robin scheduling policy. They are expressed using greatest fixed point formulas, which capture invariants that must hold throughout all system executions.
+
 *Property 3* — Cyclic order of thread initiation:
 prove FlightComputer_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & [true]X)
 This states that after every dispatch output followed by a completion, the scheduler must eventually be able to accept a new thread registration on initial, ensuring the round-robin cycle continues.
+
 *Property 4* — Each thread completes before being re-dispatched:
 prove FlightComputer_Sched_0 max X.((['dispatch](not <'dispatch>TT & [complete]<'dispatch>TT)) & [true]X)
 This states that after any dispatch, another dispatch is not immediately possible, and only becomes possible again after a complete is received, ensuring no thread is re-dispatched before finishing.
 
 Mutual Exclusion Property
+
 *Property 5* — Serialized dispatching under multi-core assumption:
 prove FlightComputer_Sched_0 max X.((['dispatch](not <'dispatch>TT & [complete]<'dispatch>TT)) & [true]X)
 This states that although the scheduler accepts multiple concurrent initiation requests on initial, it dispatches threads strictly one at a time. After each dispatch output, no further dispatch is possible until the currently running thread signals its completion on complete, enforcing an orderly serialized dispatching discipline.
