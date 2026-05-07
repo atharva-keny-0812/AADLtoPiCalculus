@@ -514,9 +514,9 @@ agent FlightComputer_Sched_4(initial, dispatch, complete, y_1, y_2, y_3, y_4) = 
 agent FlightControlSystemRefinedImplInstance = (^initial, dispatch, complete, c_1, sensor_status, position_output, velocity_output, thrust_adjustment, thrust_input, position_input, control_output, velocity_input, command_input, activation, x_1, x_2, x_3, x_4) (SensorProcess(initial, dispatch, complete, x_1, activation, position_input, x_2, velocity_input, thrust_input) | ControlProcess(initial, dispatch, complete, x_3, command_input, velocity_input, thrust_input, position_input) | ActuatorProcess(initial, dispatch, complete, x_4, command_input, activation) | AvionicsBus(c_1) | FlightComputer_Sched_0(initial, dispatch, complete))
 ```
 
-![equivalencechecking](images/Appendices/eq_check.PNG)
+![equivalencechecking](images/Appendices/eq_check.png)
 
-*Figure: Equivalence Checking
+*Figure: Equivalence Checking*
 ---
 
 # II. AADL to $\pi$-Calculus Model Transformation Tool
