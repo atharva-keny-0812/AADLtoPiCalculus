@@ -1,4 +1,4 @@
-# Appendices of the paper Mapping AADL into $\pi$-calculus for Formal Verification of Complex Architectures
+# I. Appendices of the paper Mapping AADL into $\pi$-calculus for Formal Verification of Complex Architectures
 
 ## A. Flight Control System AADL Specification
 
@@ -313,7 +313,7 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 
 ---
 
-# AADL to $\pi$-Calculus Model Transformation Tool
+# II. AADL to $\pi$-Calculus Model Transformation Tool
 
 This repository provides an automated model-driven toolchain to bridge the gap between architectural modeling in **AADL** and formal verification in **$\pi$-Calculus**. The tool automates the mapping rules defined in our approach to facilitate the formal analysis of real-time systems.
 
@@ -324,7 +324,7 @@ The above figure gives the entire outline of the project.
 
 ---
 
-## Repository Structure
+## 1) Repository Structure
 
 * **`plugins/`**: Contains the pre-compiled `.jar` files for immediate deployment into OSATE.
     * `fr.mem4csd.aadl2picalculus.acceleo.pi.jar` (Core Transformation Logic)
@@ -336,7 +336,7 @@ The above figure gives the entire outline of the project.
 
 ---
 
-## Project Workflow: From AADL to π‑Calculus Verification
+## 2) Project Workflow: From AADL to π‑Calculus Verification
 
 The verification workflow consists of three main stages: (1) modeling the system architecture in AADL using OSATE, (2) automatically translating the AADL model to π‑calculus using a custom plugin, and (3) verifying temporal properties using the Mobility Workbench (MWB).
 
@@ -418,9 +418,9 @@ The verification results confirm that the translated model preserves the intende
 
 This workflow enables rigorous formal verification of real‑time embedded architectures by bridging the gap between industrial modeling standards (AADL) and process algebraic verification tools (π‑calculus + MWB).
 
-## Installation & Usage
+## 3) Installation & Usage
 
-### For End Users (Immediate Use)
+### a. For End Users (Immediate Use)
 If you simply want to perform transformations within OSATE, you do not need to build the source code.
 
 1.  Navigate to the `plugins/` folder in this repository.
@@ -429,7 +429,7 @@ If you simply want to perform transformations within OSATE, you do not need to b
 4.  Restart OSATE with the `-clean` flag to refresh the configuration.
 5.  **Right-click** any **AADL Instance file (`.aaxl2`)** and select **"Convert AADL to Pi-Calculus"**.
 
-### For Developers (Building from Source)
+### b. For Developers (Building from Source)
 To explore or modify the mapping rules:
 
 1.  **Import Projects**: Import all projects from the `src/` folder into your OSATE workspace.
@@ -443,21 +443,21 @@ To explore or modify the mapping rules:
 
 ---
 
-## Validation with Benchmarks
+## 4) Validation with Benchmarks
 
 The `sampleAADLProjects/` folder includes a variety of AADL models that represent common embedded real‑time architectural patterns. These models serve as benchmarks to ensure that the generated π‑calculus specifications accurately capture the concurrency, communication, and scheduling semantics of the source architecture. Each model is systematically verified using temporal logic (modal μ‑calculus) in the Mobility Workbench, checking for deadlock freedom, safety, liveness, and schedulability properties.
 
 ---
 
-## 1. RMA Model – Rate‑Monotonic Scheduling ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/rma))
+## 1) RMA Model – Rate‑Monotonic Scheduling ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/rma))
 
-### Model Explanation
+### a. Model Explanation
 
 This AADL model illustrates a classic Rate‑Monotonic Scheduling (RMA) system running on a single processor. RMA is a fixed‑priority scheduling policy where tasks with shorter periods get higher priorities an optimal priority assignment for independent periodic tasks under preemptive scheduling.
 
 This model captures a two‑task Rate‑Monotonic Scheduling (RMA) system executing on a single processor. Task1 has a period of 1000 ms and lower priority; Task2 has a period of 500 ms and higher priority. Both tasks autonomously release a single job at initialization, wait for dispatch from a centralized FIFO scheduler, execute for one discrete time tick (`t`), and signal completion. The scheduler maintains a bounded queue of length two. The model represents one hyperperiod—after both tasks execute once, the system reaches a quiescent termination state.
 
-### AADL Code
+### b. AADL Code
 
 ```aadl
 --  This AADL model illustrates how to conduct schedulability analysis
@@ -582,7 +582,7 @@ end RMAAadl;
 
 ```
 
-### Pi Calculus expression
+### c. Pi Calculus expression
 
 ```pi
 agent NodeA(initial, dispatch, complete, x_1, x_2) = Task1_Halted(initial, dispatch, complete, x_1) | Task2_Halted(initial, dispatch, complete, x_2)
@@ -602,7 +602,7 @@ agent Cpu_Sched_2(initial, dispatch, complete, y_1, y_2) = 'dispatch<y_1>.comple
 agent RmaImplInstance = (^initial, dispatch, complete, x_1, x_2) (NodeA(initial, dispatch, complete, x_1, x_2) | Cpu_Sched_0(initial, dispatch, complete))
 ```
 
-### Temporal Logic Properties (MWB)
+### d. Temporal Logic Properties (MWB)
 
 ```mwb
 -- Global deadlock freedom
@@ -641,15 +641,15 @@ check RmaImplInstance mu X. (<t> TT | <tau> TT)
 
 ---
 
-## 2. Car Model ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/car))
+## 2) Car Model ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/car))
 
-### Model Explanation
+### a. Model Explanation
 
 This AADL model captures a distributed automotive control system to verify end‑to‑end data flow, distributed schedulability, and absence of communication deadlocks across multiple electronic control units (ECUs). It serves as a case study for analysing real‑time constraints under mixed scheduling policies and shared bus communication.
 
 This model represents a distributed automotive control architecture with three Electronic Control Units (ECUs)—Process A, Process B, and Process C—executing nine periodic tasks that communicate via message‑passing over a shared CAN bus. Each ECU has its own local scheduler with a queue depth of nine. Tasks have producer‑consumer dependencies: T1 produces `m1_out` for T6; T5 produces `m2_out` for T2; T6 produces `m3_out` for T9; and T9 produces `m4_out` for T8. Cross‑ECU messages traverse the CAN bus, while the `m4` exchange between T8 and T9 is local to Process C. The model verifies end‑to‑end data flow, distributed schedulability, and absence of cross‑ECU communication deadlocks.
 
-### AADL Code
+### b. AADL Code
 
 ```aadl
 -- This model represents the case study from the chapter written by
@@ -867,7 +867,7 @@ end Car;
 
 ```
 
-### Pi Calculus expression
+### c. Pi Calculus expression
 
 ```pi
 agent ProcessA(initial, dispatch, complete, x_1, m1_out, x_2, m2_in) = T1_Halted(initial, dispatch, complete, x_1, m1_out) | T2_Halted(initial, dispatch, complete, x_2, m2_in)
@@ -947,7 +947,7 @@ agent CPUC_Sched_9(initial, dispatch, complete, y_1, y_2, y_3, y_4, y_5, y_6, y_
 agent CarImplInstance = (^c_1, m4_in, m3_in, m1_in, m2_in, x_1, x_2, x_3, x_4, x_5, x_6, x_7, x_8, x_9, initial, dispatch, complete) (ProcessA(initial, dispatch, complete, x_1, m1_in, x_2, m2_in) | ProcessB(initial, dispatch, complete, x_3, x_4, x_5, m2_in, x_6, m1_in, m3_in) | ProcessC(initial, dispatch, complete, x_7, x_8, m4_in, x_9, m4_in, m3_in) | CAN(c_1) | CPUA_Sched_0(initial, dispatch, complete) | CPUB_Sched_0(initial, dispatch, complete) | CPUC_Sched_0(initial, dispatch, complete))
 ```
 
-### Temporal Logic Properties (MWB)
+### d. Temporal Logic Properties (MWB)
 
 ```mwb
 -- Global deadlock freedom
@@ -1035,15 +1035,15 @@ check CarImplInstance mu X. (<t> TT | <tau> TT)
 
 ---
 
-## 3. Line Follower Robot ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/line_follower))
+## 3) Line Follower Robot ([Source](https://github.com/OpenAADL/AADLib/tree/master/examples/line_follower))
 
-### Model Explanation
+### a. Model Explanation
 
 This AADL model represents a minimal embedded control system for a line‑following robot based on an ATmega328p microcontroller (Arduino Duemilanove). It captures the hardware/software integration and verifies that the periodic control task can acquire the CPU, complete execution, and communicate correctly over an I²C bus without deadlock reflecting bare‑metal execution without a full RTOS.
 
 This model represents a minimal embedded control system typical of a line‑following robot running on an ATmega328p microcontroller. A single periodic task performs the control loop (sensor read, computation, actuator update), while an I²C bus agent models peripheral communication. The scheduler is intentionally simple, capable of managing only one pending task at a time, reflecting bare‑metal execution without an RTOS. The model verifies that the task successfully acquires the CPU, completes execution, and that the I²C bus correctly relays messages without deadlock.
 
-### AADL Code
+### b. AADL Code
 
 ```aadl
 package Robot_LF
@@ -1121,7 +1121,7 @@ end Robot_LF;
 
 ```
 
-### Pi Calculus expression
+### c. Pi Calculus expression
 
 ```pi
 agent Code(initial, dispatch, complete, x_1) = Task1_Halted(initial, dispatch, complete, x_1)
@@ -1139,7 +1139,7 @@ agent ATMEGA328p_Sched_1(initial, dispatch, complete, y_1) = 'dispatch<y_1>.comp
 agent LineFollowerRobotIInstance = (^c_1, , x_1, initial, dispatch, complete) (Code(initial, dispatch, complete, x_1) | I2C(c_1) | ATMEGA328p_Sched_0(initial, dispatch, complete))
 ```
 
-### Temporal Logic Properties (MWB)
+### d. Temporal Logic Properties (MWB)
 
 ```mwb
 -- Global deadlock freedom
