@@ -313,7 +313,210 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 
 **Equivalence checking**  (c.f. Figure below)
 
+To ensure that the refinement process preserves the intended behaviour of the system, we perform equivalence checking between the original AADL model and the refined AADL model produced by the RAMSES tool. 
 
+The Refined AADL Model
+```aadl
+package FlightControlSystemRefined
+public
+
+with Data_Model;
+with Deployment_Properties;
+with Communication_Properties;
+
+-- Data Type Definitions
+data Position
+properties
+    Data_Model::Data_Representation => Float;
+end Position;
+
+data Velocity
+properties
+    Data_Model::Data_Representation => Float;
+end Velocity;
+
+data ControlCommand
+properties
+    Data_Model::Data_Representation => Float;
+end ControlCommand;
+
+-- Processor and Bus Definitions
+processor FlightCompute
+end FlightCompute;
+
+bus AvionicsBus
+end AvionicsBus;
+
+-- Add a virtual processor type to act as a classifier [cite: 599]
+virtual processor Partition_Runtime
+end Partition_Runtime;
+
+-- Sensor Thread Definitions
+thread PositionSensorThread
+features
+    position_output : out data port Position;
+    sensor_status : out event port;
+properties
+    Dispatch_Protocol => Periodic;
+end PositionSensorThread;
+
+thread VelocitySensorThread
+features
+    velocity_output : out data port Velocity;
+    thrust_adjustment : out event data port Velocity;
+properties
+    Dispatch_Protocol => Periodic;
+    Communication_Properties::Queue_Size => 5 applies to thrust_adjustment;
+end VelocitySensorThread;
+
+-- Control Thread Definitions
+thread ControlLawThread
+features
+    position_input : in data port Position;
+    velocity_input : in data port Velocity;
+    thrust_input : in event data port Velocity;
+    control_output : out data port ControlCommand;
+properties
+    Dispatch_Protocol => Periodic;
+    Communication_Properties::Queue_Size => 5 applies to thrust_input;
+end ControlLawThread;
+
+-- Actuator Thread Definition
+thread MainActuatorThread
+features
+    command_input : in data port ControlCommand;
+    activation : in event port;
+properties
+    Dispatch_Protocol => Periodic;
+    Communication_Properties::Queue_Size => 5 applies to activation;
+end MainActuatorThread;
+
+-- Process Definitions
+process SensorProcessing
+features
+    position_data : out data port Position;
+    velocity_data : out data port Velocity;
+    sensor_status : out event port;
+    thrust_adjustment : out event data port Velocity;
+end SensorProcessing;
+
+process implementation SensorProcessing.Impl
+subcomponents
+    position_sensor : thread PositionSensorThread;
+    velocity_sensor : thread VelocitySensorThread;
+connections
+    position_connection : port position_sensor.position_output -> position_data;
+    velocity_connection : port velocity_sensor.velocity_output -> velocity_data;
+    status_connection : port position_sensor.sensor_status -> sensor_status;
+    thrust_connection : port velocity_sensor.thrust_adjustment -> thrust_adjustment;
+end SensorProcessing.Impl;
+
+process ControlProcessing
+features
+    position_input : in data port Position;
+    velocity_input : in data port Velocity;
+    thrust_input : in event data port Velocity;
+    control_command : out data port ControlCommand;
+end ControlProcessing;
+
+process implementation ControlProcessing.Impl
+subcomponents
+    control_law : thread ControlLawThread;
+connections
+    position_connection : port position_input -> control_law.position_input;
+    velocity_connection : port velocity_input -> control_law.velocity_input;
+    thrust_connection : port thrust_input -> control_law.thrust_input;
+    control_connection : port control_law.control_output -> control_command;
+end ControlProcessing.Impl;
+
+process ActuatorProcessing
+features
+    command_input : in data port ControlCommand;
+    activation : in event port;
+end ActuatorProcessing;
+
+process implementation ActuatorProcessing.Impl
+subcomponents
+    main_actuator : thread MainActuatorThread;
+connections
+    command_connection : port command_input -> main_actuator.command_input;
+    activation_connection : port activation -> main_actuator.activation;
+end ActuatorProcessing.Impl;
+
+-- Top-Level System
+system FlightControlSystemRefined
+end FlightControlSystem;
+
+system implementation FlightControlSystemRefined.Impl
+subcomponents
+    sensor_process : process SensorProcessing.Impl;
+    control_process : process ControlProcessing.Impl;
+    actuator_process : process ActuatorProcessing.Impl;
+    flight_computer : processor FlightCompute;
+    avionics_bus : bus AvionicsBus;
+    sensor_partition : virtual processor Partition_Runtime;
+    control_partition : virtual processor Partition_Runtime;
+    actuator_partition : virtual processor Partition_Runtime;
+connections
+    sensor_to_control_position : port sensor_process.position_data -> control_process.position_input;
+    sensor_to_control_velocity : port sensor_process.velocity_data -> control_process.velocity_input;
+    sensor_to_control_thrust : port sensor_process.thrust_adjustment -> control_process.thrust_input;
+    control_to_actuator : port control_process.control_command -> actuator_process.command_input;
+    sensor_status_to_actuator : port sensor_process.sensor_status -> actuator_process.activation;
+
+properties
+    Deployment_Properties::Actual_Processor_Binding => (reference (flight_computer)) applies to sensor_partition;
+    Deployment_Properties::Actual_Processor_Binding => (reference (flight_computer)) applies to control_partition;
+    Deployment_Properties::Actual_Processor_Binding => (reference (flight_computer)) applies to actuator_partition;
+    Deployment_Properties::Actual_Connection_Binding => (reference (avionics_bus)) applies to sensor_to_control_position;
+    Deployment_Properties::Actual_Connection_Binding => (reference (avionics_bus)) applies to sensor_to_control_velocity;
+    Deployment_Properties::Actual_Connection_Binding => (reference (avionics_bus)) applies to sensor_to_control_thrust;
+    Deployment_Properties::Actual_Connection_Binding => (reference (avionics_bus)) applies to control_to_actuator;
+    Deployment_Properties::Actual_Connection_Binding => (reference (avionics_bus)) applies to sensor_status_to_actuator;
+    Deployment_Properties::Actual_Processor_Binding => (reference (sensor_partition)) applies to sensor_process;
+    Deployment_Properties::Actual_Processor_Binding => (reference (control_partition)) applies to control_process;
+    Deployment_Properties::Actual_Processor_Binding => (reference (actuator_partition)) applies to actuator_process;
+end FlightControlSystemRefined.Impl;
+
+end FlightControlSystemRefined;
+```
+The full π-calculus Code Generated in MWB Format for the Refined AADL
+
+```pi
+agent SensorProcess(initial, dispatch, complete, x_1, sensor_status, position_output, x_2, velocity_output, thrust_adjustment) = PositionSensor_Halted(initial, dispatch, complete, x_1, sensor_status, position_output) | VelocitySensor_Halted(initial, dispatch, complete, x_2, velocity_output, thrust_adjustment)
+agent ControlProcess(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input) = ControlLaw_Halted(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input)
+agent ActuatorProcess(initial, dispatch, complete, x_4, command_input, activation) = MainActuator_Halted(initial, dispatch, complete, x_4, command_input, activation)
+
+agent PositionSensor_Halted(initial, dispatch, complete, x_1, sensor_status, position_output) = 'initial<x_1>.PositionSensor_Wait(initial, dispatch, complete, x_1, sensor_status, position_output)
+agent PositionSensor_Wait(initial, dispatch, complete, x_1, sensor_status, position_output) = dispatch(d).[d=x_1]PositionSensor_Compute(initial, dispatch, complete, x_1, sensor_status, position_output)
+agent PositionSensor_Compute(initial, dispatch, complete, x_1, sensor_status, position_output) = t.'sensor_status.(^x_1_position_output_v)'position_output<x_1_position_output_v>.'complete<x_1>.PositionSensor_Wait(initial, dispatch, complete, x_1, sensor_status, position_output)
+
+agent VelocitySensor_Halted(initial, dispatch, complete, x_2, velocity_output, thrust_adjustment) = 'initial<x_2>.VelocitySensor_Wait(initial, dispatch, complete, x_2, velocity_output, thrust_adjustment)
+agent VelocitySensor_Wait(initial, dispatch, complete, x_2, velocity_output, thrust_adjustment) = dispatch(d).[d=x_2]VelocitySensor_Compute(initial, dispatch, complete, x_2, velocity_output, thrust_adjustment)
+agent VelocitySensor_Compute(initial, dispatch, complete, x_2, velocity_output, thrust_adjustment) = t.(^x_2_velocity_output_v)'velocity_output<x_2_velocity_output_v>.(^x_2_thrust_adjustment_v)'thrust_adjustment<x_2_thrust_adjustment_v>.'complete<x_2>.VelocitySensor_Wait(initial, dispatch, complete, x_2, velocity_output, thrust_adjustment)
+
+agent ControlLaw_Halted(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input) = 'initial<x_3>.ControlLaw_Wait(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input)
+agent ControlLaw_Wait(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input) = dispatch(d).[d=x_3]ControlLaw_Compute(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input)
+agent ControlLaw_Compute(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input) = velocity_input(x_3_velocity_input_v).thrust_input(x_3_thrust_input_v).position_input(x_3_position_input_v).t.(^x_3_control_output_v)'control_output<x_3_control_output_v>.'complete<x_3>.ControlLaw_Wait(initial, dispatch, complete, x_3, control_output, velocity_input, thrust_input, position_input)
+
+agent MainActuator_Halted(initial, dispatch, complete, x_4, command_input, activation) = 'initial<x_4>.MainActuator_Wait(initial, dispatch, complete, x_4, command_input, activation)
+agent MainActuator_Wait(initial, dispatch, complete, x_4, command_input, activation) = dispatch(d).[d=x_4]MainActuator_Compute(initial, dispatch, complete, x_4, command_input, activation)
+agent MainActuator_Compute(initial, dispatch, complete, x_4, command_input, activation) = command_input(x_4_command_input_v).activation.t.'complete<x_4>.MainActuator_Wait(initial, dispatch, complete, x_4, command_input, activation)
+
+agent AvionicsBus(c_1) = c_1(c_1_data).t.'c_1<c_1_data>.AvionicsBus(c_1)
+
+agent FlightComputer_Sched_0(initial, dispatch, complete) = initial(y_1).FlightComputer_Sched_1(initial, dispatch, complete, y_1) 
+agent FlightComputer_Sched_1(initial, dispatch, complete, y_1) = initial(y_2).FlightComputer_Sched_2(initial, dispatch, complete, y_1, y_2) + 'dispatch<y_1>.complete(y_1).FlightComputer_Sched_0(initial, dispatch, complete)
+agent FlightComputer_Sched_2(initial, dispatch, complete, y_1, y_2) = initial(y_3).FlightComputer_Sched_3(initial, dispatch, complete, y_1, y_2, y_3) + 'dispatch<y_1>.complete(y_1).FlightComputer_Sched_1(initial, dispatch, complete, y_2)
+agent FlightComputer_Sched_3(initial, dispatch, complete, y_1, y_2, y_3) = initial(y_4).FlightComputer_Sched_4(initial, dispatch, complete, y_1, y_2, y_3, y_4) + 'dispatch<y_1>.complete(y_1).FlightComputer_Sched_2(initial, dispatch, complete, y_2, y_3)
+agent FlightComputer_Sched_4(initial, dispatch, complete, y_1, y_2, y_3, y_4) = 'dispatch<y_1>.complete(y_1).FlightComputer_Sched_3(initial, dispatch, complete, y_2, y_3, y_4)
+
+agent FlightControlSystemRefinedImplInstance = (^initial, dispatch, complete, c_1, sensor_status, position_output, velocity_output, thrust_adjustment, thrust_input, position_input, control_output, velocity_input, command_input, activation, x_1, x_2, x_3, x_4) (SensorProcess(initial, dispatch, complete, x_1, activation, position_input, x_2, velocity_input, thrust_input) | ControlProcess(initial, dispatch, complete, x_3, command_input, velocity_input, thrust_input, position_input) | ActuatorProcess(initial, dispatch, complete, x_4, command_input, activation) | AvionicsBus(c_1) | FlightComputer_Sched_0(initial, dispatch, complete))
+```
+
+![equivalencechecking](images/Appendices/eq_check.PNG)
+
+*Figure: Equivalence Checking
 ---
 
 # II. AADL to $\pi$-Calculus Model Transformation Tool
