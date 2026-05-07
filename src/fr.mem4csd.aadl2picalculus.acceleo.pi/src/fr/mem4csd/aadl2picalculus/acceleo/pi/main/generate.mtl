@@ -18,18 +18,93 @@
 [for (fi : FeatureInstance | ti.featureInstance) before(', ') separator(', ')][fi.name.toLower() /][/for][/template]
 
 [comment -- Logic: How data moves. 'out' sends data, 'in' receives data -- /]
-[template public genCommAction(fi : FeatureInstance, xId : String)]
-[let vName : String = xId + '_' + fi.name.toLower() + '_v'][if (fi.direction.toString() = 'out')][if (fi.category.toString() = 'dataPort')](^[vName /])'[fi.name.toLower() /]<[vName /]>[else]'[fi.name.toLower() /][/if][else][fi.name.toLower() /]([vName /])[/if][/let][/template]
+[query public genCommAction(fi : FeatureInstance, xId : String) : String = 
+    let vName : String = xId + '_' + fi.name.toLower() + '_v' in
+    if (fi.direction.toString() = 'out') then
+        if (fi.category.toString() = 'dataPort' or fi.category.toString() = 'eventDataPort') then
+            '(^' + vName + ')\'' + fi.name.toLower() + '<' + vName + '>'
+        else
+            '\'' + fi.name.toLower()
+        endif
+    else
+        if (fi.category.toString() = 'dataPort' or fi.category.toString() = 'eventDataPort') then
+            fi.name.toLower() + '(' + vName + ')'
+        else
+            fi.name.toLower()
+        endif
+    endif
+/]
+
+[query public genCanonicalPortName(fi : FeatureInstance, allConns : Sequence(ConnectionInstance)) : String =
+
+    if fi.direction.toString() = 'out'
+
+    then
+
+        let matched : Sequence(ConnectionInstance) = allConns->select(ci | ci.source.name = fi.name and ci.source.eContainer() = fi.eContainer())
+
+        in if matched->notEmpty() then matched->first().destination.name.toLower() else fi.name.toLower() endif
+
+    else
+
+        fi.name.toLower()
+
+    endif /]
+
+[query public getBusStringList(allBuses : Sequence(ComponentInstance)) : String =
+    let busIds : Sequence(String) = allBuses->collect(bi | getBusCId(bi, allBuses))->asSequence() in
+    busIds->iterate(s; acc : String = '' | 
+        if acc = '' then s else acc + ', ' + s endif
+    )
+/]
+
+[query public getFeatureStringList(allThreads : Sequence(ComponentInstance)) : String =
+    let featureNames : Sequence(String) = allThreads->collect(ti | ti.featureInstance->collect(fi | fi.name.toLower()))->flatten()->asSequence() in
+    featureNames->iterate(s; acc : String = '' | 
+        if acc = '' then s else acc + ', ' + s endif
+    )
+/]
+
+[query public getThreadStringList(allThreads : Sequence(ComponentInstance)) : String =
+    let threadIds : Sequence(String) = allThreads->collect(ti | getThreadXId(ti, allThreads))->asSequence() in
+    threadIds->iterate(s; acc : String = '' | 
+        if acc = '' then s else acc + ', ' + s endif
+    )
+/]
+
+[query public buildAgentSuffix(allBuses : Sequence(ComponentInstance), allThreads : Sequence(ComponentInstance)) : String =
+    let busPart : String = getBusStringList(allBuses) in
+    let featPart : String = getFeatureStringList(allThreads) in
+    let threadPart : String = getThreadStringList(allThreads) in
+    let combined : String =
+        (if busPart = '' then '' else busPart endif) +
+        (if busPart = '' or featPart = '' then '' else ', ' endif) +
+        (if featPart = '' then '' else featPart endif) +
+        (if (busPart = '' and featPart = '') or threadPart = '' then '' else ', ' endif) +
+        (if threadPart = '' then '' else threadPart endif)
+    in
+    if combined = '' then '' else ', ' + combined endif
+/]
 
 [comment -- START GENERATING THE PI-CALCULUS FILE -- /]
+
 [template public generatePi(aSystemInstance : SystemInstance)]
+
 [comment @main /]
+
 [file (aSystemInstance.name.toLower().concat('_system.pi'), false, 'UTF-8')]
-[comment -- Gather all Threads, Buses, and Processes into lists -- /]
-[let allThreads : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'thread')->asSequence()]
-[let allBuses : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'bus')->asSequence()]
-[let allProcesses : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'process')->asSequence()]
+
+[let allThreads    : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'thread')->asSequence()]
+
+[let allBuses      : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'bus')->asSequence()]
+
+[let allProcesses  : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'process')->asSequence()]
+
 [let allProcessors : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'processor')->asSequence()]
+
+[let allConns      : Sequence(ConnectionInstance) = aSystemInstance.eAllContents(ConnectionInstance)->asSequence()]
+
+
 
 [comment -- PROCESS:/]
 [for (pi : ComponentInstance | allProcesses)]
@@ -64,8 +139,12 @@ agent [procName /]_Sched_[i /](initial, dispatch, complete[for (j : Integer | cu
 [/let][/for][/let]
 [/for]
 
-[comment -- SYSTEM ASSEMBLY: Connects software and hardware together -- /]
-agent [genAgentName(aSystemInstance).trim() /] = (^[for (bi : ComponentInstance | allBuses) separator(', ')][getBusCId(bi, allBuses) /][/for][for (ti : ComponentInstance | allThreads)][for (fi : FeatureInstance | ti.featureInstance)], [fi.name.toLower() /][/for][/for], initial, dispatch, complete[for (ti : ComponentInstance | allThreads)], [getThreadXId(ti, allThreads) /][/for]) [if (allProcesses->notEmpty() or allBuses->notEmpty() or allProcessors->notEmpty())]([for (pi : ComponentInstance | allProcesses) separator(' | ')][genAgentName(pi).trim() /](initial, dispatch, complete[for (sub : ComponentInstance | pi.componentInstance->select(c | c.category.toString() = 'thread'))], [getThreadXId(sub, allThreads) /][genPortList(sub) /][/for])[/for][if (allBuses->notEmpty())] | [/if][for (bi : ComponentInstance | allBuses) separator(' | ')][genAgentName(bi).trim() /]([getBusCId(bi, allBuses) /])[/for][if (allProcessors->notEmpty())] | [/if][for (proc : ComponentInstance | allProcessors) separator(' | ')][genAgentName(proc).trim() /]_Sched_0(initial, dispatch, complete)[/for])[/if]
-[/let][/let][/let][/let]
+agent [genAgentName(aSystemInstance).trim() /] = (^initial, dispatch, complete[buildAgentSuffix(allBuses, allThreads)/]) [if (allProcesses->notEmpty() or allBuses->notEmpty() or allProcessors->notEmpty())]([for (pi : ComponentInstance | allProcesses) separator(' | ')][genAgentName(pi).trim() /](initial, dispatch, complete[for (sub : ComponentInstance | pi.componentInstance->select(c | c.category.toString() = 'thread'))], [getThreadXId(sub, allThreads) /][for (fi : FeatureInstance | sub.featureInstance) before(', ') separator(', ')][genCanonicalPortName(fi, allConns) /][/for][/for])[/for][if (allBuses->notEmpty())] | [/if][for (bi : ComponentInstance | allBuses) separator(' | ')][genAgentName(bi).trim() /]([getBusCId(bi, allBuses) /])[/for][if (allProcessors->notEmpty())] | [/if][for (proc : ComponentInstance | allProcessors) separator(' | ')][genAgentName(proc).trim() /]_Sched_0(initial, dispatch, complete)[/for])[/if]
+
+
+
+[/let][/let][/let][/let][/let]
+
 [/file]
+
 [/template]

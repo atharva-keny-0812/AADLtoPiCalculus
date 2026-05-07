@@ -33,9 +33,9 @@ public class Generate extends AbstractAcceleoGenerator {
     /**
      * The name of the module.
      *
-     * @generated
+     * @generated NOT
      */
-    public static final String MODULE_FILE_NAME = "/fr/mem4csd/aadl2picalculus/acceleo/pi/main/generate";
+    public static final String MODULE_FILE_NAME = "bin/fr/mem4csd/aadl2picalculus/acceleo/pi/main/generate";
     
     /**
      * The name of the templates that are to be generated.
