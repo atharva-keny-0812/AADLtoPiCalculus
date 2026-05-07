@@ -88,9 +88,12 @@
 
 [comment -- START GENERATING THE PI-CALCULUS FILE -- /]
 
+
 [template public generatePi(aSystemInstance : SystemInstance)]
 
+
 [comment @main /]
+
 
 [file (aSystemInstance.name.toLower().concat('_system.pi'), false, 'UTF-8')]
 
@@ -100,7 +103,18 @@
 
 [let allProcesses  : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'process')->asSequence()]
 
+
+[let allThreads    : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'thread')->asSequence()]
+
+[let allBuses      : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'bus')->asSequence()]
+
+[let allProcesses  : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'process')->asSequence()]
+
 [let allProcessors : Sequence(ComponentInstance) = aSystemInstance.eAllContents(ComponentInstance)->select(c | c.category.toString() = 'processor')->asSequence()]
+
+[let allConns      : Sequence(ConnectionInstance) = aSystemInstance.eAllContents(ConnectionInstance)->asSequence()]
+
+
 
 [let allConns      : Sequence(ConnectionInstance) = aSystemInstance.eAllContents(ConnectionInstance)->asSequence()]
 
@@ -146,5 +160,6 @@ agent [genAgentName(aSystemInstance).trim() /] = (^initial, dispatch, complete[b
 [/let][/let][/let][/let][/let]
 
 [/file]
+
 
 [/template]
