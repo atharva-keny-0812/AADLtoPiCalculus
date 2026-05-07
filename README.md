@@ -312,6 +312,10 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 *Figure: Liveness, Schedulability, Mutual Exclusion*
 
 ---
+**equivalence checking**
+
+
+---
 
 # II. AADL to $\pi$-Calculus Model Transformation Tool
 
