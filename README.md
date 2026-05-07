@@ -309,9 +309,7 @@ Liveness properties verify that desired states are eventually reached during the
 
 *Property 1* — MainActuator eventually receives a command:
 
-prove MainActuator_Halted min X.([command_input] | (<true>X | <'true>X))
-
-check MainActuator_Halted min X.([command_input]TT | (<true>X | <'true>X))
+prove MainActuator_Halted min X.([command_input]TT | (<true>X | <'true>X))
 
 
 This states that starting from MainActuator_Halted, the process will eventually be able to perform a read on channel command_input. Along the way, it may perform any number of input or output actions on other channels.
@@ -319,8 +317,6 @@ This states that starting from MainActuator_Halted, the process will eventually 
 *Property 2* — PositionSensor eventually outputs position data:
 
 prove PositionSensor_Halted min X.(['position_output]TT | (<true>X | <'true>X))
-
-check PositionSensor_Halted min X.(['position_output]TT | (<true>X | <'true>X))
 
 
 This states that starting from PositionSensor_Halted, the process will eventually be able to perform a write on channel position_output. Similarly, any intermediate input or output steps are permitted before reaching this output.
