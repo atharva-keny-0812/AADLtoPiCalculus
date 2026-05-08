@@ -315,9 +315,6 @@ Liveness properties verify that desired states are eventually reached during the
 prove MainActuator_Halted min X.([command_input]TT | (<true>X | <'true>X))
 ```
 
-![Property](images/Appendices/prop1.png)
-*Figure: Liveness*
-
 This states that starting from MainActuator_Halted, the process will eventually be able to perform a read on channel command_input. Along the way, it may perform any number of input or output actions on other channels.
 
 *Property 2* — PositionSensor eventually outputs position data:
@@ -325,9 +322,6 @@ This states that starting from MainActuator_Halted, the process will eventually 
 ```
 prove PositionSensor_Halted min X.(['position_output]TT | (<true>X | <'true>X))
 ```
-
-![Property](images/Appendices/prop2.png)
-*Figure: Liveness*
 
 This states that starting from PositionSensor_Halted, the process will eventually be able to perform a write on channel position_output. Similarly, any intermediate input or output steps are permitted before reaching this output.
 
@@ -341,9 +335,6 @@ Schedulability properties verify that the system respects its Round-Robin schedu
 prove FlightComputer_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & (<true>X | <'true>X))
 ```
 
-![Property](images/Appendices/prop3.png)
-*Figure: Schedulability*
-
 This states that after every dispatch output followed by a completion, the scheduler must eventually be able to accept a new thread registration on initial, ensuring the round-robin cycle continues.
 
 *Property 4* — Each thread completes before being re-dispatched:
@@ -351,9 +342,6 @@ This states that after every dispatch output followed by a completion, the sched
 ```
 prove ControlLaw_Halted max X.(([dispatch](['complete]TT & [dispatch]FF)) & (<true>X | <'true>X))
 ```
-
-![Property](images/Appendices/prop4.png)
-*Figure: Schedulability*
 
 This states that after any dispatch, another dispatch is not immediately possible, and only becomes possible again after a complete is received, ensuring no thread is re-dispatched before finishing.
 
@@ -365,10 +353,10 @@ This states that after any dispatch, another dispatch is not immediately possibl
 prove FlightComputer_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
 ```
 
-![Property](images/Appendices/prop5.png)
-*Figure: Mutual Exclusion*
-
 This states that although the scheduler accepts multiple concurrent initiation requests on initial, it dispatches threads strictly one at a time. After each dispatch output, no further dispatch is possible until the currently running thread signals its completion on complete, enforcing an orderly serialized dispatching discipline.
+
+![Properties](images/Appendices/props.png)
+*Figure: Liveness, Schedulability, Mutual Exclusion*
 
 **Equivalence checking**  (c.f. Figure below)
 
