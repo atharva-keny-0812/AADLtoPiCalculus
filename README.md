@@ -313,7 +313,7 @@ These are the properties formulas elaborated in the Mads logic (adapted from mu-
 
 *Liveness Properties*
 
-Liveness properties verify that desired states are eventually reached during the execution of the system. They are expressed using least fixed point formulas: the process may perform any sequence of input or output steps (<true>X or <'true>X), but must eventually reach the target action.
+Liveness properties verify that desired states are eventually reached during the execution of the system. They are expressed using least fixed point formulas: the process may perform any sequence of input or output steps ```(<true>X or <'true>X)```, but must eventually reach the target action.
 
 *Property 1* — MainActuator eventually receives a command:
 
