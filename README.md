@@ -2,6 +2,8 @@
 
 ## A. Flight Control System AADL Specification
 
+This code represents the AADL Specification of the case study Flight Control System.
+
 ```aadl
 package FlightControlSystem
 public
