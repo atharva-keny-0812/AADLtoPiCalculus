@@ -220,7 +220,7 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 
 ## C. Analysis and Verification Proofs
 
-Here, we present different analysis and verification tasks performed using the MWB tool. We have used a typical basic development computer with this configuration: Apple M3 system with 8-core CPU, up to 10-core GPU, 8 GB to 24 GB of unified memory, and up to 2 TB SSD storage, running a virtual machine Ubuntu standard PC based on the i440FX + PIIX chipset from 1996 (i386 architecture), with 2 GB of RAM, a 6.76 GB disk. All properties have been verified successfully using MWB, and all verification scripts are available in this repository. It is also possible to use CADP as indicated in the paper, by just using the PIC2LNT module.
+Here, we present different analysis and verification tasks performed using the MWB tool. We have used a typical basic development computer with this configuration: Apple M3 system with 8-core CPU, up to 10-core GPU, 8 GB to 24 GB of unified memory, and up to 2 TB SSD storage, running a virtual machine Ubuntu standard PC based on the i440FX + PIIX chipset from 1996 (i386 architecture), with 2 GB of RAM, a 6.76 GB disk. All properties have been verified successfully using MWB, and all verification scripts are available in this repository. It is also possible to use CADP tool as indicated in the paper, by just using the PIC2LNT module.
 
 **Simulation** (c.f. Figure below)
 
