@@ -641,7 +641,7 @@ Right‑clicking on the AADL system implementation invokes the translation plugi
 
 ![Generated π‑Calculus Code](images/workflow%20diagram/pi_output.png)
 
-The generated code includes agents for each thread (e.g., `PositionSensor_Halted`, `ControlLaw_Compute`), the scheduler (`FlightComputer_Sched_0`), and the avionics bus (`AvionicsBus`).
+The generated code includes agents for each thread (e.g., `PositionSensor_Halted`, `ControlLaw_Compute`), the scheduler (`FlightComputer_Sched_0`), the avionics bus (`AvionicsBus`), and the system composition of all these processes.
 
 ---
 
