@@ -309,6 +309,10 @@ Liveness properties verify that desired states are eventually reached during the
 
 *Property 1* — MainActuator eventually receives a command:
 
+```
+prove MainActuator_Halted min X.([command_input]TT | (<true>X | <'true>X))
+```
+
 This states that starting from MainActuator_Halted, the process will eventually be able to perform a read on channel command_input. Along the way, it may perform any number of input or output actions on other channels.
 
 *Property 2* — PositionSensor eventually outputs position data:
