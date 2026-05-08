@@ -224,11 +224,16 @@ Here, we present different analysis and verification tasks performed using the M
 
 **Simulation** (c.f. Figure below)
 
+We can simulate the execution of the system process FlightControlSystem. The command step interactively runs the defined process step-by-step. At each step (state) of the simulation, MWB shows us the different possible actions of the process (numbered from 0 to N). We can then choose one of the actions and MWB will
+then present us the new choices of actions.
+
 ![Simulation of the main process](images/Appendices/step.png)
 
 *Figure: Simulation of the main process*
 
 **Deadlock Freedom** (c.f. Figure below)
+
+We check the deadlock of the system here.
 
 ![Deadlock details](images/Appendices/deadlock.png)
 
