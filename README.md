@@ -655,13 +655,6 @@ The generated π‑calculus file is loaded into the Mobility Workbench (MWB), wh
 - **Schedulability** – Tasks meet their bounded execution time.
 - Other Functional Properties Specific to the Model.
 
-Example MWB check for global deadlock freedom:
-
-```mwb
-check FlightControlSystemImplInstance nu X. (<true> TT & [true] X)
-```
-The verification results confirm that the translated model preserves the intended concurrency and communication semantics of the original AADL specification.
-
 ### Workflow Summary Diagram:
 
 ```text
