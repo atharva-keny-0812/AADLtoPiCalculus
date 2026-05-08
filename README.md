@@ -860,34 +860,21 @@ agent RmaImplInstance = (^initial, dispatch, complete, x_1, x_2) (NodeA(initial,
 -- Global deadlock freedom
 deadlocks RmaImplInstance
 
--- Individual component deadlocks
-deadlocks Task1_Halted<initial,dispatch,complete,x_1>
-deadlocks Task2_Halted<initial,dispatch,complete,x_2>
-deadlocks Cpu_Sched_0<initial,dispatch,complete>
-
--- Safety (no error labels)
-check Task1_Compute<initial,dispatch,complete,x_1> nu X. ([error] FF & [t] X & [dispatch] X)
-check Task2_Compute<initial,dispatch,complete,x_2> nu X. ([error] FF & [t] X & [dispatch] X)
-check Cpu_Sched_0<initial,dispatch,complete> nu X. (['dispatch] FF & [initial] X & [t] X)
+-- Mutual Exclusion
+prove Cpu_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
 
 -- Liveness (tasks eventually complete)
-check Task1_Compute<initial,dispatch,complete,x_1> mu X. (<'complete> TT | <t> X)
-check Task2_Compute<initial,dispatch,complete,x_2> mu X. (<'complete> TT | <t> X)
+prove Task1_Halted min X.(['complete]TT | (<true>X | <'true>X))
+prove Task2_Halted min X.(['complete]TT | (<true>X | <'true>X))
 
--- Scheduler progress
-check Cpu_Sched_1<initial,dispatch,complete,y_1> mu X. (<'dispatch> TT | <initial> X)
-check Cpu_Sched_2<initial,dispatch,complete,y_1,y_2> mu X. (<'dispatch> TT | <initial> X)
+-- Safety
+prove Task1_Wait max X.(([dispatch]<'complete>TT) & (<true>X | <'true>X))
+prove Cpu_Sched_0 max X.(([initial]<'dispatch>TT) & (<true>X | <'true>X))
+prove Task1_Compute max X.(([dispatch]FF) & (<true>X | <'true>X))
+prove Cpu_Sched_0 max X.((<'dispatch>TT | <initial>TT) & (<true>X | <'true>X))
 
--- Bounded response (deadline meet)
-check Task1_Compute<initial,dispatch,complete,x_1> <t> (<'complete> TT)
-check Task2_Compute<initial,dispatch,complete,x_2> <t> (<'complete> TT)
-
--- Periodic readiness
-check Task1_Compute<initial,dispatch,complete,x_1> <'complete<x_1>> (<initial> TT)
-check Task2_Compute<initial,dispatch,complete,x_2> <'complete<x_2>> (<initial> TT)
-
--- Global liveness
-check RmaImplInstance mu X. (<t> TT | <tau> TT)
+-- Schedulability
+prove Cpu_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & (<true>X | <'true>X))
 ```
 [Link to the verified property screenshots](https://docs.google.com/document/d/1jqh5mgmk27D_a5XNb1jtsB2Af1g1dSwreszifLWFI1w/edit?usp=sharing)
 
@@ -1205,83 +1192,27 @@ agent CarImplInstance = (^initial, dispatch, complete, c_1, m1_out, m2_in, m2_ou
 -- Global deadlock freedom
 deadlocks CarImplInstance
 
--- Individual component deadlocks
-deadlocks T1_Halted<initial,dispatch,complete,x_1,m1_out>
-deadlocks T2_Halted<initial,dispatch,complete,x_2,m2_in>
-deadlocks T3_Halted<initial,dispatch,complete,x_3>
-deadlocks T4_Halted<initial,dispatch,complete,x_4>
-deadlocks T5_Halted<initial,dispatch,complete,x_5,m2_out>
-deadlocks T6_Halted<initial,dispatch,complete,x_6,m1_in,m3_out>
-deadlocks T7_Halted<initial,dispatch,complete,x_7>
-deadlocks T8_Halted<initial,dispatch,complete,x_8,m4_in>
-deadlocks T9_Halted<initial,dispatch,complete,x_9,m4_out,m3_in>
-deadlocks CAN<c_1>
-deadlocks CPUA_Sched_0<initial,dispatch,complete>
-deadlocks CPUB_Sched_0<initial,dispatch,complete>
-deadlocks CPUC_Sched_0<initial,dispatch,complete>
-
--- Safety (no error labels)
-check T1_Compute<initial,dispatch,complete,x_1,m1_out> nu X. ([error] FF & [t] X & [dispatch] X)
-check T2_Compute<initial,dispatch,complete,x_2,m2_in> nu X. ([error] FF & [t] X & [dispatch] X)
-check T3_Compute<initial,dispatch,complete,x_3> nu X. ([error] FF & [t] X & [dispatch] X)
-check T4_Compute<initial,dispatch,complete,x_4> nu X. ([error] FF & [t] X & [dispatch] X)
-check T5_Compute<initial,dispatch,complete,x_5,m2_out> nu X. ([error] FF & [t] X & [dispatch] X)
-check T6_Compute<initial,dispatch,complete,x_6,m1_in,m3_out> nu X. ([error] FF & [t] X & [dispatch] X)
-check T7_Compute<initial,dispatch,complete,x_7> nu X. ([error] FF & [t] X & [dispatch] X)
-check T8_Compute<initial,dispatch,complete,x_8,m4_in> nu X. ([error] FF & [t] X & [dispatch] X)
-check T9_Compute<initial,dispatch,complete,x_9,m4_out,m3_in> nu X. ([error] FF & [t] X & [dispatch] X)
-
-check CPUA_Sched_0<initial,dispatch,complete> nu X. (['dispatch] FF & [initial] X & [t] X)
-check CPUB_Sched_0<initial,dispatch,complete> nu X. (['dispatch] FF & [initial] X & [t] X)
-check CPUC_Sched_0<initial,dispatch,complete> nu X. (['dispatch] FF & [initial] X & [t] X)
-
 -- Liveness (tasks eventually complete)
-check T1_Compute<initial,dispatch,complete,x_1,m1_out> mu X. (<'complete> TT | <t> X)
-check T2_Compute<initial,dispatch,complete,x_2,m2_in> mu X. (<'complete> TT | <t> X)
-check T3_Compute<initial,dispatch,complete,x_3> mu X. (<'complete> TT | <t> X)
-check T4_Compute<initial,dispatch,complete,x_4> mu X. (<'complete> TT | <t> X)
-check T5_Compute<initial,dispatch,complete,x_5,m2_out> mu X. (<'complete> TT | <t> X)
-check T6_Compute<initial,dispatch,complete,x_6,m1_in,m3_out> mu X. (<'complete> TT | <t> X)
-check T7_Compute<initial,dispatch,complete,x_7> mu X. (<'complete> TT | <t> X)
-check T8_Compute<initial,dispatch,complete,x_8,m4_in> mu X. (<'complete> TT | <t> X)
-check T9_Compute<initial,dispatch,complete,x_9,m4_out,m3_in> mu X. (<'complete> TT | <t> X)
+prove T1_Halted min X.(['m1_out]TT | (<true>X | <'true>X))
+prove T9_Halted min X.(['m4_out]TT | (<true>X | <'true>X))
 
--- Scheduler progress (non-empty queue)
-check CPUA_Sched_1<initial,dispatch,complete,y_1> mu X. (<'dispatch> TT | <initial> X)
-check CPUB_Sched_1<initial,dispatch,complete,y_1> mu X. (<'dispatch> TT | <initial> X)
-check CPUC_Sched_1<initial,dispatch,complete,y_1> mu X. (<'dispatch> TT | <initial> X)
+-- Safety
+prove T6_Wait max X.(([dispatch]([m1_in]<'m3_out>TT)) & (<true>X | <'true>X))
+prove T9_Wait max X.(([dispatch]([m3_in]<'m4_out>TT)) & (<true>X | <'true>X))
+prove CPUA_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
+prove CPUB_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
+prove CPUC_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
+prove CAN max X.(([c_1]<'c_1>TT) & (<true>X | <'true>X))
 
--- Bounded response (deadline meet)
-check T1_Compute<initial,dispatch,complete,x_1,m1_out> <t> (<'complete> TT)
-check T2_Compute<initial,dispatch,complete,x_2,m2_in> <t> (<'complete> TT)
-check T3_Compute<initial,dispatch,complete,x_3> <t> (<'complete> TT)
-check T4_Compute<initial,dispatch,complete,x_4> <t> (<'complete> TT)
-check T5_Compute<initial,dispatch,complete,x_5,m2_out> <t> (<'complete> TT)
-check T6_Compute<initial,dispatch,complete,x_6,m1_in,m3_out> <t> (<'complete> TT)
-check T7_Compute<initial,dispatch,complete,x_7> <t> (<'complete> TT)
-check T8_Compute<initial,dispatch,complete,x_8,m4_in> <t> (<'complete> TT)
-check T9_Compute<initial,dispatch,complete,x_9,m4_out,m3_in> <t> (<'complete> TT)
+-- Schedulability
+prove CPUA_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & (<true>X | <'true>X))
+prove CPUB_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & (<true>X | <'true>X))
+prove CPUC_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & (<true>X | <'true>X))
 
--- Periodic readiness
-check T1_Compute<initial,dispatch,complete,x_1,m1_out> <'complete<x_1>> (<initial> TT)
-check T2_Compute<initial,dispatch,complete,x_2,m2_in> <'complete<x_2>> (<initial> TT)
-check T3_Compute<initial,dispatch,complete,x_3> <'complete<x_3>> (<initial> TT)
-check T4_Compute<initial,dispatch,complete,x_4> <'complete<x_4>> (<initial> TT)
-check T5_Compute<initial,dispatch,complete,x_5,m2_out> <'complete<x_5>> (<initial> TT)
-check T6_Compute<initial,dispatch,complete,x_6,m1_in,m3_out> <'complete<x_6>> (<initial> TT)
-check T7_Compute<initial,dispatch,complete,x_7> <'complete<x_7>> (<initial> TT)
-check T8_Compute<initial,dispatch,complete,x_8,m4_in> <'complete<x_8>> (<initial> TT)
-check T9_Compute<initial,dispatch,complete,x_9,m4_out,m3_in> <'complete<x_9>> (<initial> TT)
-
--- CAN bus liveness
-check CAN<c_1> nu X. ([tau] X | <tau> TT)
-check CAN<c_1> <c_1> (<t> (<'c_1> TT))
-
--- Message-passing liveness (example for m1)
-check CarImplInstance max Z. ((<m1_in>TT | <'m1_out>TT) & [m1_in]Z & ['m1_out]Z)
-
--- Global liveness
-check CarImplInstance mu X. (<t> TT | <tau> TT)
+-- Mutual Exclusion
+prove CPUA_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
+prove CPUB_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
+prove CPUC_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
 ```
 [Link to the verified property screenshots](https://docs.google.com/document/d/1MRmTpVZiZ-QzQoIXYwZDHvQ-EXVTRcHlH6csgvZ_zJg/edit?usp=sharing)
 
@@ -1397,32 +1328,20 @@ agent LineFollowerRobotIInstance = (^initial, dispatch, complete, c_1, x_1) (Cod
 -- Global deadlock freedom
 deadlocks LineFollowerRobotIInstance 
 
--- Individual component deadlocks
-deadlocks Task1_Halted<initial,dispatch,complete,x_1>
-deadlocks I2C<c_1>
-deadlocks ATMEGA328p_Sched_0<initial,dispatch,complete>
-
--- Safety (no error labels)
-check Task1_Compute<initial,dispatch,complete,x_1> nu X. ([error] FF & [t] X & [dispatch] X)
-check ATMEGA328p_Sched_0<initial,dispatch,complete> nu X. (['dispatch] FF & [initial] X & [t] X)
+-- Safety
+prove Task1_Wait max X.(([dispatch]<'complete>TT) & (<true>X | <'true>X))
+prove ATMEGA328p_Sched_0 max X.(([initial]<'dispatch>TT) & (<true>X | <'true>X))
+prove Task1_Compute max X.(([dispatch]FF) & (<true>X | <'true>X))
+prove I2C max X.(([c_1]<'c_1>TT) & (<true>X | <'true>X))
 
 -- Liveness (task completes)
-check Task1_Compute<initial,dispatch,complete,x_1> mu X. (<'complete> TT | <t> X)
+prove Task1_Halted min X.([dispatch]TT | (<true>X | <'true>X))
+prove Task1_Halted min X.(['complete]TT | (<true>X | <'true>X))
 
--- Scheduler progress
-check ATMEGA328p_Sched_1<initial,dispatch,complete,y_1> mu X. (<'dispatch> TT | <initial> X)
+-- Schedulability
+prove ATMEGA328p_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & (<true>X | <'true>X))
 
--- Bounded response (deadline meet)
-check Task1_Compute<initial,dispatch,complete,x_1> <t> (<'complete> TT)
-
--- Periodic readiness
-check Task1_Compute<initial,dispatch,complete,x_1> <'complete<x_1>> (<initial> TT)
-
--- I2C bus liveness
-check I2C<c_1> nu X. ([tau] X | <tau> TT)
-check I2C<c_1> <c_1> (<t> (<'c_1> TT))
-
--- Global liveness
-check LineFollowerRobotIInstance mu X. (<t> TT | <tau> TT)
+-- Mutual Exclusion
+prove ATMEGA328p_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dispatch>TT)) & (<true>X | <'true>X))
 ```
 [Link to the verified property screenshots](https://docs.google.com/document/d/1iOYBqWbarYBXchkh8ZTUH78GDRACpIEm3THGzpjJ25Y/edit?usp=sharing)
