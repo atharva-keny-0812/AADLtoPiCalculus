@@ -605,10 +605,12 @@ The verification workflow consists of three main stages: (1) modeling the system
 
 The system architecture is first modeled using the Architecture Analysis and Design Language (AADL) within the OSATE (Open Source AADL Tool Environment) platform. The model captures:
 
-- **Threads** – Periodic tasks with timing properties (period, deadline, WCET).
-- **Ports** – Data ports for regular sensor streams, event ports for status signals, and event‑data ports for urgent adjustments.
-- **Processors and Buses** – Execution resources and communication channels.
-- **Bindings** – Mapping of software components to hardware resources.
+- **Threads** 
+- **Ports** 
+- **Processors**
+- **Bus**
+- **Connections**
+- **Top Level System**
 
 **Screenshot: AADL Model in OSATE**
 
@@ -629,7 +631,6 @@ A custom OSATE plugin (`Convert AADL to Pi‑Calculus`) automatically translates
 | Event port | Channel without data (e.g., `sensor_status`) |
 | Processor | Scheduler agent (`FlightComputer_Sched_0`) |
 | Bus | Bus agent (e.g., `AvionicsBus`) |
-| Dispatch protocol | `'initial`, `'dispatch`, `'complete` handshake |
 
 **Screenshot: Plugin Trigger in OSATE**
 
