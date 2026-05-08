@@ -220,7 +220,7 @@ agent FlightControlSystem = (^c, position_output, velocity_output, sensor_status
 
 ## C. Analysis and Verification Proofs
 
-Here, we present different analysis and verification tasks performed using the MWB tool. All properties have been verified successfully using MWB. All verification scripts are available in this repository.
+Here, we present different analysis and verification tasks performed using the MWB tool. We have used a typical basic development computer with this configuration: Apple M3 system with 8-core CPU, up to 10-core GPU, 8 GB to 24 GB of unified memory, and up to 2 TB SSD storage. All properties have been verified successfully using MWB. All verification scripts are available in this repository.
 
 **Simulation** (c.f. Figure below)
 
