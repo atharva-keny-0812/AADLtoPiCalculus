@@ -224,13 +224,13 @@ Here, we present different analysis and verification tasks performed using the M
 
 **Simulation** (c.f. Figure below)
 
-![Simulation of the main process](images/Appendices/fig98.PNG)
+![Simulation of the main process](images/Appendices/step.png)
 
 *Figure: Simulation of the main process*
 
 **Deadlock Freedom** (c.f. Figure below)
 
-![Deadlock details](images/Appendices/fig100.PNG)
+![Deadlock details](images/Appendices/deadlock.png)
 
 *Figure: Deadlock details*
 
@@ -316,6 +316,7 @@ prove MainActuator_Halted min X.([command_input]TT | (<true>X | <'true>X))
 ```
 
 ![Property](images/Appendices/prop1.png)
+*Figure: Liveness*
 
 This states that starting from MainActuator_Halted, the process will eventually be able to perform a read on channel command_input. Along the way, it may perform any number of input or output actions on other channels.
 
@@ -326,6 +327,7 @@ prove PositionSensor_Halted min X.(['position_output]TT | (<true>X | <'true>X))
 ```
 
 ![Property](images/Appendices/prop2.png)
+*Figure: Liveness*
 
 This states that starting from PositionSensor_Halted, the process will eventually be able to perform a write on channel position_output. Similarly, any intermediate input or output steps are permitted before reaching this output.
 
@@ -340,6 +342,7 @@ prove FlightComputer_Sched_0 max X.((['dispatch]([complete]<initial>TT)) & (<tru
 ```
 
 ![Property](images/Appendices/prop3.png)
+*Figure: Schedulability*
 
 This states that after every dispatch output followed by a completion, the scheduler must eventually be able to accept a new thread registration on initial, ensuring the round-robin cycle continues.
 
@@ -350,6 +353,7 @@ prove ControlLaw_Halted max X.(([dispatch](['complete]TT & [dispatch]FF)) & (<tr
 ```
 
 ![Property](images/Appendices/prop4.png)
+*Figure: Schedulability*
 
 This states that after any dispatch, another dispatch is not immediately possible, and only becomes possible again after a complete is received, ensuring no thread is re-dispatched before finishing.
 
@@ -362,18 +366,9 @@ prove FlightComputer_Sched_0 max X.((['dispatch](<'dispatch>FF & [complete]<'dis
 ```
 
 ![Property](images/Appendices/prop5.png)
+*Figure: Mutual Exclusion*
 
 This states that although the scheduler accepts multiple concurrent initiation requests on initial, it dispatches threads strictly one at a time. After each dispatch output, no further dispatch is possible until the currently running thread signals its completion on complete, enforcing an orderly serialized dispatching discipline.
-
-
-
-
-
-
-
-![Liveness, Schedulability, Mutual Exclusion](images/Appendices/fig101.PNG)
-
-*Figure: Liveness, Schedulability, Mutual Exclusion*
 
 **Equivalence checking**  (c.f. Figure below)
 
